@@ -2,7 +2,8 @@
 
 
 #include "Justin/Base/CWeaponBase.h"
-
+#include "EngineUtils.h"
+#include "Justin/Base/CInteractableItem.h"
 #include "Net/UnrealNetwork.h"
 
 ACWeaponBase::ACWeaponBase()
@@ -16,6 +17,11 @@ bool ACWeaponBase::CanReload() const
 }
 
 void ACWeaponBase::Reload()
+{
+	ServerReload();
+}
+
+void ACWeaponBase::ServerReload_Implementation()
 {
 	ensure(CanReload());
 
@@ -48,6 +54,11 @@ void ACWeaponBase::Fire()
 		InMagRemainingRounds = 0;
 }
 
+void ACWeaponBase::BeginPlay()
+{
+	Super::BeginPlay();
+}
+
 void ACWeaponBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
@@ -60,10 +71,18 @@ void ACWeaponBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLife
 void ACWeaponBase::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
-	if (GetOwner())
+	GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Black, FString::Printf(TEXT("Owner: %s"), *GetNameSafe(GetOwner())));
+
+	if (GetWorld()->IsNetMode(NM_Client))
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Black, FString::Printf(TEXT("Reserve: %d"), ReserveTotalRounds));
-		GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Black, FString::Printf(TEXT("Total: %d"), InMagTotalRounds));
-		GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Black, FString::Printf(TEXT("Remaining: %d"), InMagRemainingRounds));
+		GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Black, FString::Printf(TEXT("Client")));
 	}
+	else
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Black, FString::Printf(TEXT("Server")));
+	}
+	GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Black, FString::Printf(TEXT("Reserve: %d"), ReserveTotalRounds));
+	GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Black, FString::Printf(TEXT("Total: %d"), InMagTotalRounds));
+	GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Black, FString::Printf(TEXT("Remaining: %d"), InMagRemainingRounds));
+
 }

@@ -22,11 +22,16 @@ public:
 	bool CanReload() const;
 	UFUNCTION(BlueprintCallable, Category = "Settings|Test")
 	void Reload();
+
+	UFUNCTION(Server, Reliable)
+	void ServerReload();
+
 	UFUNCTION(BlueprintCallable, Category = "Settings|Test")
 	bool CanFire() const;
 	UFUNCTION(BlueprintCallable, Category = "Settings|Test")
 	void Fire();
 protected:
+	virtual void BeginPlay() override; 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual void Tick(float DeltaSeconds) override;
 
