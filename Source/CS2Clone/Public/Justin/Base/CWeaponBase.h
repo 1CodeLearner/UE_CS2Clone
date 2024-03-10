@@ -13,6 +13,7 @@ UCLASS()
 class CS2CLONE_API ACWeaponBase : public ACGameplayActor
 {
 	GENERATED_BODY()
+
 public:
 	ACWeaponBase();
 	//For UI update only 
@@ -25,21 +26,23 @@ public:
 
 	UFUNCTION(Server, Reliable)
 	void ServerReload();
+	void ServerReload_Implementation();
 
 	UFUNCTION(BlueprintCallable, Category = "Settings|Test")
 	bool CanFire() const;
 	UFUNCTION(BlueprintCallable, Category = "Settings|Test")
 	void Fire();
+
 protected:
-	virtual void BeginPlay() override; 
+	virtual void BeginPlay() override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual void Tick(float DeltaSeconds) override;
 
 private:
-	UPROPERTY(EditAnywhere, Category="Settings|Rounds")
+	UPROPERTY(EditAnywhere, Replicated, Category="Settings|Rounds")
 	int ReserveTotalRounds;
 	UPROPERTY(EditAnywhere, Category="Settings|Rounds")
 	int InMagTotalRounds;
-	UPROPERTY(EditAnywhere, Category="Settings|Rounds")
-	int InMagRemainingRounds; 
+	UPROPERTY(EditAnywhere, Replicated, Category="Settings|Rounds")
+	int InMagRemainingRounds;
 };

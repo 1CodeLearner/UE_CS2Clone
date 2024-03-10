@@ -3,12 +3,13 @@
 
 #include "Justin/Base/CWeaponBase.h"
 #include "EngineUtils.h"
-#include "Justin/Base/CInteractableItem.h"
 #include "Net/UnrealNetwork.h"
+#include "GameFramework/Character.h"
 
 ACWeaponBase::ACWeaponBase()
 {
 	PrimaryActorTick.bCanEverTick = true;
+	SetReplicates(true);
 }
 
 bool ACWeaponBase::CanReload() const
@@ -57,21 +58,27 @@ void ACWeaponBase::Fire()
 void ACWeaponBase::BeginPlay()
 {
 	Super::BeginPlay();
+
+	/*
+	for (TActorIterator<ACharacter> Iter(GetWorld()); Iter; ++Iter)
+	{
+		SetOwner(Cast<AActor>(*Iter));
+	}*/
 }
 
 void ACWeaponBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	/*DOREPLIFETIME_CONDITION(ACWeaponBase, ReserveTotalRounds, COND_OwnerOnly);
-	DOREPLIFETIME_CONDITION(ACWeaponBase, InMagTotalRounds, COND_OwnerOnly);
-	DOREPLIFETIME_CONDITION(ACWeaponBase, InMagRemainingRounds, COND_OwnerOnly);*/
+	DOREPLIFETIME_CONDITION(ACWeaponBase, ReserveTotalRounds, COND_OwnerOnly);
+	DOREPLIFETIME_CONDITION(ACWeaponBase, InMagRemainingRounds, COND_OwnerOnly);
 }
 
 void ACWeaponBase::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
-	GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Black, FString::Printf(TEXT("Owner: %s"), *GetNameSafe(GetOwner())));
+	GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Black,
+	                                 FString::Printf(TEXT("Owner: %s"), *GetNameSafe(GetOwner())));
 
 	if (GetWorld()->IsNetMode(NM_Client))
 	{
@@ -83,6 +90,6 @@ void ACWeaponBase::Tick(float DeltaSeconds)
 	}
 	GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Black, FString::Printf(TEXT("Reserve: %d"), ReserveTotalRounds));
 	GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Black, FString::Printf(TEXT("Total: %d"), InMagTotalRounds));
-	GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Black, FString::Printf(TEXT("Remaining: %d"), InMagRemainingRounds));
-
+	GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Black,
+	                                 FString::Printf(TEXT("Remaining: %d"), InMagRemainingRounds));
 }
