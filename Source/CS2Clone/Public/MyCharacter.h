@@ -38,11 +38,23 @@ public:
 	class UInputAction* ia_Look;
 	UPROPERTY(EditAnywhere)
 	class UInputAction* ia_Jump;
+	UPROPERTY(EditAnywhere)
+	class UInputAction* ia_GetDrop;
 
+	UPROPERTY(VisibleInstanceOnly)
+	TArray<class AActor*> allItem;
+	
+	UPROPERTY(EditAnywhere)
+	class UInventoryComponent* invenComp;
+
+	//camera
+	UPROPERTY(EditAnywhere)
+	class UCameraComponent* camera;
 	
 
 public:
 	void EnhancedMove(const struct FInputActionValue& value);
 	void EnhancedJump(const struct FInputActionValue& value);
 	void EnhancedLook(const struct FInputActionValue& value);
+	void EnhancedGetDrop(const struct FInputActionValue& value);
 };

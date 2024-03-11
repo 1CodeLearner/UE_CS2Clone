@@ -2,6 +2,9 @@
 #include <../../../../../../../Plugins/EnhancedInput/Source/EnhancedInput/Public/EnhancedInputSubsystems.h>
 #include <../../../../../../../Plugins/EnhancedInput/Source/EnhancedInput/Public/EnhancedInputComponent.h>
 #include <../../../../../../../Source/Runtime/Engine/Classes/Engine/SkeletalMesh.h>
+#include <../../../../../../../Source/Runtime/Engine/Classes/Camera/CameraComponent.h>
+#include <../../../../../../../Source/Runtime/Engine/Classes/GameFramework/SpringArmComponent.h>
+#include "InventoryComponent.h"
 
 // Sets default values
 AMyCharacter::AMyCharacter()
@@ -9,14 +12,24 @@ AMyCharacter::AMyCharacter()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	//skeleta mesh 셋팅
 	ConstructorHelpers::FObjectFinder<USkeletalMesh> tempMesh(TEXT("/Script/Engine.SkeletalMesh'/Game/Characters/Mannequins/Meshes/SKM_Manny.SKM_Manny'"));
 	if (tempMesh.Succeeded())
 	{
 		GetMesh()->SetSkeletalMesh(tempMesh.Object);
 	}
-
+	
+	// 메쉬 위치 셋팅
 	GetMesh()->SetRelativeLocation(FVector(0, 0, -88));
 	GetMesh()->SetRelativeRotation(FRotator(0, -90, 0));
+
+	//springArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("springArm"));
+	//springArm->SetupAttachment(RootComponent);
+	camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
+	camera->SetupAttachment(RootComponent);
+
+	//invencomp
+	invenComp = CreateDefaultSubobject<UInventoryComponent>(TEXT("PlayerInventory"));
 }
 
 // Called when the game starts or when spawned
@@ -48,9 +61,9 @@ void AMyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	if(enhancedInputComponent != nullptr)
 	{
 		enhancedInputComponent->BindAction(ia_Move, ETriggerEvent::Triggered, this, &AMyCharacter::EnhancedMove);
-		//enhancedInputComponent->BindAction(ia_Move, ETriggerEvent::Completed, this, &AMyCharacter::EnhancedMove);
 		enhancedInputComponent->BindAction(ia_Jump, ETriggerEvent::Triggered, this, &AMyCharacter::EnhancedJump);
 		enhancedInputComponent->BindAction(ia_Look, ETriggerEvent::Triggered, this, &AMyCharacter::EnhancedLook);
+		enhancedInputComponent->BindAction(ia_GetDrop, ETriggerEvent::Started, this, &AMyCharacter::EnhancedGetDrop);
 	}
 }
 
@@ -65,7 +78,6 @@ void AMyCharacter::EnhancedMove(const struct FInputActionValue& value)
 
 void AMyCharacter::EnhancedJump(const struct FInputActionValue& value)
 {
-	UE_LOG(LogTemp, Warning, TEXT("jump"));
 	Jump();
 }
 
@@ -76,5 +88,10 @@ void AMyCharacter::EnhancedLook(const struct FInputActionValue& value)
 	AddControllerYawInput(dir.X);
 	AddControllerPitchInput(dir.Y);
 
+}
+
+void AMyCharacter::EnhancedGetDrop(const struct FInputActionValue& value)
+{
+	UE_LOG(LogTemp, Warning, TEXT("f"));
 }
 
