@@ -35,6 +35,7 @@ protected:
 	UPROPERTY(EditAnywhere, Category=Settings)
 	TObjectPtr<UDataTable> DT_Weapons;
 
+	//¹«
 	UPROPERTY(VisibleAnywhere, Category = Settings)
 	FWeaponInfo WeaponInfo;
 
