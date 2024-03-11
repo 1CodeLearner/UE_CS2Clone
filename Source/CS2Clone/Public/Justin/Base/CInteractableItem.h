@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Justin/ItemTypes.h"
+#include "GameplayTagContainer.h"
 #include "CInteractableItem.generated.h"
 
 class UBoxComponent;
@@ -24,10 +25,13 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category="Settings")
 	TObjectPtr<UStaticMeshComponent> SMComp;
 	
-	UPROPERTY(EditDefaultsOnly, Category="Settings")
+	UPROPERTY(EditDefaultsOnly, Category = "Settings")
 	TObjectPtr<UBoxComponent> BoxComp;
 
-	UPROPERTY(VisibleAnywhere, Category="Settings")
+	UPROPERTY(EditAnywhere, Category=Settings)
+	FGameplayTag WeaponNameTag;
+
+	UPROPERTY()
 	FWeaponInfo WeaponInfo;
 
 	UFUNCTION()

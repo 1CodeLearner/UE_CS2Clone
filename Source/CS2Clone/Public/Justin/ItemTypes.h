@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
 #include "ItemTypes.generated.h"
 
 class ACWeaponBase;
@@ -10,7 +11,7 @@ class ACInteractableItem;
 class UTexture2D;
 
 
-UENUM()
+UENUM(BlueprintType)
 enum class EInventorySlotType
 {
 	INV_PRIMARY UMETA(DisplayName="Primary"),
@@ -18,35 +19,48 @@ enum class EInventorySlotType
 	INV_MELEE UMETA(DisplayName="Melee"),
 	INV_UTILITY UMETA(DisplayName="Utility"),
 	INV_BOMB UMETA(DisplayName="Bomb"),
+	INV_MAX UMETA(DisplayName="Max")
 };
 
-USTRUCT()
+USTRUCT(BlueprintAble)
 struct FWeaponInfo : public FTableRowBase
 {
-	GENERATED_BODY()
+	GENERATED_USTRUCT_BODY()
+	
+	FWeaponInfo() 
+	{
+		DisplayName = FText::FromString(FString::Printf(TEXT("")));
+		InventorySlotType = EInventorySlotType::INV_MAX;
+		InventoryImage = nullptr;
+		StoreImage = nullptr;
+		DroppedWeaponClass = nullptr;
+		WeaponBaseClass = nullptr;
+		ReserveTotalRounds = 0;
+		InMagTotalRounds = 0;
+	}
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Weapon")
 	FText DisplayName;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
 	EInventorySlotType InventorySlotType;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
 	TObjectPtr<UTexture2D> InventoryImage;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
 	TObjectPtr<UTexture2D> StoreImage;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
 	TSubclassOf<ACInteractableItem> DroppedWeaponClass;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
 	TSubclassOf<ACWeaponBase> WeaponBaseClass;
 
-	UPROPERTY(EditAnywhere, meta=(ClampMin="0.0"))
-	int TotalRounds;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(ClampMin="0.0"), Category = "Weapon")
+	int ReserveTotalRounds;
 
-	UPROPERTY(EditAnywhere, meta=(ClampMin="0.0"))
-	int InMagRounds;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(ClampMin="0.0"), Category = "Weapon")
+	int InMagTotalRounds;
 };
 
