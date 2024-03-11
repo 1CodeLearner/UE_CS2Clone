@@ -1,0 +1,31 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
+
+#include "Justin/Base/CInteractableItem.h"
+#include "Components/StaticMeshComponent.h"
+#include "Components/BoxComponent.h"
+#include "Components/PrimitiveComponent.h"
+
+ACInteractableItem::ACInteractableItem()
+{
+	PrimaryActorTick.bCanEverTick = true;
+	
+	BoxComp = CreateDefaultSubobject<UBoxComponent>("BoxComponent");
+	RootComponent = BoxComp;
+
+	SMComp = CreateDefaultSubobject<UStaticMeshComponent>("StaticMeshComponent");
+	SMComp->SetupAttachment(RootComponent);
+}
+
+void ACInteractableItem::BeginPlay()
+{
+	Super::BeginPlay();
+
+	BoxComp->OnComponentBeginOverlap.AddDynamic(this, &ACInteractableItem::OnOverlapBegin);
+}
+
+void ACInteractableItem::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	//°¡
+}
+
