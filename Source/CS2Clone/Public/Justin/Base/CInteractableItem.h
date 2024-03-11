@@ -5,10 +5,12 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Justin/ItemTypes.h"
+#include "GameplayTagContainer.h"
 #include "CInteractableItem.generated.h"
 
 class UBoxComponent;
 class UStaticMeshComponent;
+class UDataTable; 
 
 UCLASS(Abstract)
 class CS2CLONE_API ACInteractableItem : public AActor
@@ -24,10 +26,16 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category="Settings")
 	TObjectPtr<UStaticMeshComponent> SMComp;
 	
-	UPROPERTY(EditDefaultsOnly, Category="Settings")
+	UPROPERTY(EditDefaultsOnly, Category = "Settings")
 	TObjectPtr<UBoxComponent> BoxComp;
 
-	UPROPERTY(VisibleAnywhere, Category="Settings")
+	UPROPERTY(EditAnywhere, Category=Settings)
+	FGameplayTag WeaponNameTag;
+
+	UPROPERTY(EditAnywhere, Category=Settings)
+	TObjectPtr<UDataTable> DT_Weapons;
+
+	UPROPERTY(VisibleAnywhere, Category = Settings)
 	FWeaponInfo WeaponInfo;
 
 	UFUNCTION()
