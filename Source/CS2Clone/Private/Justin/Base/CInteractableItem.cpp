@@ -9,7 +9,7 @@
 ACInteractableItem::ACInteractableItem()
 {
 	PrimaryActorTick.bCanEverTick = true;
-	
+
 	BoxComp = CreateDefaultSubobject<UBoxComponent>("BoxComponent");
 	RootComponent = BoxComp;
 
@@ -25,11 +25,18 @@ void ACInteractableItem::BeginPlay()
 
 	UE_LOG(LogTemp, Warning, TEXT("Tag Name: %s"), *WeaponNameTag.GetTagName().ToString());
 
-
+	if (ensure(DT_Weapons))
+	{
+		FWeaponInfo* Info = DT_Weapons->FindRow<FWeaponInfo>(WeaponNameTag.GetTagName(), FString::Printf(TEXT("")));
+		if (ensure(Info))
+		{
+			WeaponInfo = *Info;
+		}
+	}
 }
 
 void ACInteractableItem::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	
+
 }
 

@@ -10,6 +10,7 @@
 
 class UBoxComponent;
 class UStaticMeshComponent;
+class UDataTable; 
 
 UCLASS(Abstract)
 class CS2CLONE_API ACInteractableItem : public AActor
@@ -31,7 +32,10 @@ protected:
 	UPROPERTY(EditAnywhere, Category=Settings)
 	FGameplayTag WeaponNameTag;
 
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, Category=Settings)
+	TObjectPtr<UDataTable> DT_Weapons;
+
+	UPROPERTY(VisibleAnywhere, Category = Settings)
 	FWeaponInfo WeaponInfo;
 
 	UFUNCTION()
