@@ -6,7 +6,7 @@
 #include "GameplayTagContainer.h"
 #include "ItemTypes.generated.h"
 
-class ACGameplayActor;
+class ACGameplayItem;
 class ACInteractableItem;
 class UTexture2D;
 
@@ -63,7 +63,7 @@ struct FItemType: public FTableRowBase
 
 	//플레이어가 집적 handle 하는 Actor
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
-	TSubclassOf<ACGameplayActor> GameplayItemClass;
+	TSubclassOf<ACGameplayItem> GameplayItemClass;
 };
 
 UENUM(Blueprintable)
@@ -74,11 +74,11 @@ enum class EWeaponType
 };
 
 USTRUCT(BlueprintType)
-struct FWeaponType : public FTableRowBase
+struct FWeapon : public FTableRowBase
 {
 	GENERATED_USTRUCT_BODY()
 
-	FWeaponType()
+	FWeapon()
 	{
 		EWeaponType = EWeaponType::NONE;
 		ReserveTotalRounds = 0;

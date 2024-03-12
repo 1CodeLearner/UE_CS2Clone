@@ -3,19 +3,22 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "CGameplayActor.h"
-#include "CWeaponBase.generated.h"
+#include "Justin/Base/CGameplayItem.h"
+#include "GameplayTagContainer.h"
+#include "CHandgun.generated.h"
+
+class UDataTable;
 
 //For UI update only 
 DECLARE_DYNAMIC_DELEGATE(FWeaponUpdateDelegate);
 
 UCLASS()
-class CS2CLONE_API ACWeaponBase : public ACGameplayActor
+class CS2CLONE_API ACHandgun : public ACGameplayItem
 {
 	GENERATED_BODY()
 
 public:
-	ACWeaponBase();
+	ACHandgun();
 	//For UI update only 
 	FWeaponUpdateDelegate OnWeaponUpdate;
 	//
@@ -38,11 +41,16 @@ protected:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual void Tick(float DeltaSeconds) override;
 
+	UPROPERTY(EditDefaultsOnly, Category="Settings|Init")
+	FGameplayTag WeaponTag;
+	UPROPERTY(EditDefaultsOnly, Category="Settings|Init")
+	TObjectPtr<UDataTable> DT_Weapon;
+
 private:
-	UPROPERTY(EditAnywhere, Replicated, Category="Settings|Rounds")
+	UPROPERTY(VisibleAnywhere, Replicated, Category="Settings|Rounds")
 	int ReserveTotalRounds;
-	UPROPERTY(EditAnywhere, Category="Settings|Rounds")
+	UPROPERTY(VisibleAnywhere, Category="Settings|Rounds")
 	int InMagTotalRounds;
-	UPROPERTY(EditAnywhere, Replicated, Category="Settings|Rounds")
+	UPROPERTY(VisibleAnywhere, Replicated, Category="Settings|Rounds")
 	int InMagRemainingRounds;
 };
