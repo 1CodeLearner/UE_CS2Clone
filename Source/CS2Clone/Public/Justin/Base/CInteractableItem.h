@@ -37,7 +37,7 @@ protected:
 
 	//¹«
 	UPROPERTY(VisibleAnywhere, Category = Settings)
-	FWeaponInfo WeaponInfo;
+	FItemType ItemInfo;
 
 	UFUNCTION()
 	void OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, 

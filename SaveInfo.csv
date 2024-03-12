@@ -1,0 +1,2 @@
+---,DisplayName,InventorySlotType,InventoryImage,StoreImage,DroppedWeaponClass,WeaponBaseClass,TotalRounds,InMagRounds
+Pistol_01,"NSLOCTEXT(""[C318224093E81DE76F50EAB3439035BC]"", ""AB04C57A49E59981E9E26EA2947C66D6"", ""Pistol"")","INV_SECONDARY","/Script/Engine.Texture2D'/Engine/MobileResources/HUD/AnalogHat.AnalogHat'","/Script/Engine.Texture2D'/Engine/EditorMaterials/Anchor.Anchor'","/Script/Engine.BlueprintGeneratedClass'/Game/Justin/BP_TestDroppedItem.BP_TestDroppedItem_C'","None","60","15"
