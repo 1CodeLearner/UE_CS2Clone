@@ -35,9 +35,9 @@ protected:
 	UPROPERTY(EditAnywhere, Category=Settings)
 	TObjectPtr<UDataTable> DT_Weapons;
 
-
+	//¹«
 	UPROPERTY(VisibleAnywhere, Category = Settings)
-	FItemInfo ItemInfo;
+	FWeaponInfo WeaponInfo;
 
 	UFUNCTION()
 	void OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, 

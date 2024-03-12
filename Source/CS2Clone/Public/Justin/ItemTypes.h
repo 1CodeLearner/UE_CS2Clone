@@ -6,7 +6,7 @@
 #include "GameplayTagContainer.h"
 #include "ItemTypes.generated.h"
 
-class ACGameplayActor;
+class ACWeaponBase;
 class ACInteractableItem;
 class UTexture2D;
 
@@ -23,74 +23,56 @@ enum class EInventorySlotType
 };
 
 USTRUCT(BlueprintAble)
-struct FItemInfo : public FTableRowBase
-{
-	GENERATED_USTRUCT_BODY()
-	
-	FItemInfo()
-	{
-		DisplayName = FText::FromString(FString::Printf(TEXT("")));
-		InventorySlotType = EInventorySlotType::INV_MAX;
-		InventoryImage = nullptr;
-		StoreImage = nullptr;
-		DroppedItemClass = nullptr;
-		ItemBaseClass = nullptr;
-	}
-
-	//Spawn 할때 DataTable row name 에 쓰여진다
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Item")
-	FGameplayTag WeaponTag;
-
-	//UI에 쓸 단어
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Item")
-	FText DisplayName;
-
-	//인밴토리 슬롯
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
-	EInventorySlotType InventorySlotType;
-
-	//인밴토리 이미지
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
-	TObjectPtr<UTexture2D> InventoryImage;
-
-	//상점 이미지
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
-	TObjectPtr<UTexture2D> StoreImage;
-
-	//플레이어가 땅에서 pickup 하는 Item
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
-	TSubclassOf<ACInteractableItem> DroppedItemClass;
-
-	//플레이어가 집적 handle 하는 Item
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
-	TSubclassOf<ACGameplayActor> ItemBaseClass;
-
-};
-
-UENUM(BlueprintType)
-enum class EWeaponType
-{
-	HANDGUN UMETA(DisplayName="Primary"),
-	MAX UMETA(DisplayName="MAX")
-};
-
-USTRUCT(BlueprintAble)
 struct FWeaponInfo : public FTableRowBase
 {
 	GENERATED_USTRUCT_BODY()
 	
 	FWeaponInfo() 
 	{
-		WeaponType = EWeaponType::MAX;
-		ReserveTotalRounds = 0; 
+		DisplayName = FText::FromString(FString::Printf(TEXT("")));
+		InventorySlotType = EInventorySlotType::INV_MAX;
+		InventoryImage = nullptr;
+		StoreImage = nullptr;
+		DroppedWeaponClass = nullptr;
+		WeaponBaseClass = nullptr;
+		ReserveTotalRounds = 0;
 		InMagTotalRounds = 0;
 	}
 
-	UPROPERTY(EditAnywhere)
-	EWeaponType WeaponType;
-	UPROPERTY(EditAnywhere)
-	int ReserveTotalRounds;
-	UPROPERTY(EditAnywhere)
-	int InMagTotalRounds;
+	//Spawn할때 DataTable row name 에 쓰여진다
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Weapon")
+	FGameplayTag WeaponTag;
 
+	//UI에 쓸 단어
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Weapon")
+	FText DisplayName;
+
+	//인밴토리 슬롯
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
+	EInventorySlotType InventorySlotType;
+
+	//인밴토리 이미지
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
+	TObjectPtr<UTexture2D> InventoryImage;
+
+	//상점 이미지
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
+	TObjectPtr<UTexture2D> StoreImage;
+
+	//플레이어가 땅에서 pickup 하는 Actor
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
+	TSubclassOf<ACInteractableItem> DroppedWeaponClass;
+
+	//플레이어가 집적 handle 하는 Actor
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
+	TSubclassOf<ACWeaponBase> WeaponBaseClass;
+
+	//남은 총알
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(ClampMin="0.0"), Category = "Weapon")
+	int ReserveTotalRounds;
+
+	//탄창에 들어있는 양
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(ClampMin="0.0"), Category = "Weapon")
+	int InMagTotalRounds;
 };
+
