@@ -27,6 +27,6 @@ public:
 
 public:
 	UPROPERTY(EditAnywhere)
-	TArray<FWeaponInfo> myItems;
+	TArray<FItemType> myItems;
 
 };

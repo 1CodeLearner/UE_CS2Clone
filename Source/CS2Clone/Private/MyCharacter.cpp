@@ -67,6 +67,7 @@ void AMyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 		enhancedInputComponent->BindAction(ia_Jump, ETriggerEvent::Triggered, this, &AMyCharacter::EnhancedJump);
 		enhancedInputComponent->BindAction(ia_Look, ETriggerEvent::Triggered, this, &AMyCharacter::EnhancedLook);
 		enhancedInputComponent->BindAction(ia_GetDrop, ETriggerEvent::Started, this, &AMyCharacter::EnhancedGetDrop);
+		enhancedInputComponent->BindAction(ia_InputItemSlot, ETriggerEvent::Started, this, &AMyCharacter::InputItemSlot);
 	}
 }
 
@@ -98,12 +99,30 @@ void AMyCharacter::EnhancedGetDrop(const struct FInputActionValue& value)
 	
 	UE_LOG(LogTemp, Warning, TEXT("f"));
 	//getitem()을 실행시킨다
-	GetItem();
+	//GetItem();
 
 }
 
-void AMyCharacter::GetItem()
+void AMyCharacter::InputItemSlot(const struct FInputActionValue& value)
 {
+	//input 입력값 가져와
+	int32 slotIdx = value.Get<float>();
+	slotIdx--;
+
+	//UE_LOG(LogTemp, Warning, TEXT("get value : %.d"), slotIdx);
+	GetItem((EInventorySlotType)slotIdx);
+}
+
+void AMyCharacter::GetItem(EInventorySlotType slotType)
+{
+	// 열거형을 인트형으로 형변환
+	int32 invenSlotType = (int32)slotType;
+
+	// 게임 인스턴스 가져오기
+	UCSGameInstance* gameInstance = Cast<UCSGameInstance>(GetWorld()->GetGameInstance());
+	
+	invenComp->myItems.Add(gameInstance->defineItem[invenSlotType]);
+
 	//충돌 검사를 한다
 	// allItem 값까지 반복
 	//for (int32 i = 0; i < InteractItem.Num(); i++)
@@ -124,6 +143,7 @@ void AMyCharacter::GetItem()
 	//UCSGameInstance* gameInstance = Cast<UCSGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
 	//인벤 컴포넌트에
 	//invenComp->myItems.Add(gameInstance->defineItem[slotType]);
+
 
 }
 

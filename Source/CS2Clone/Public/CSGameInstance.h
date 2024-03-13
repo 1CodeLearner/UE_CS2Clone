@@ -22,5 +22,5 @@ protected:
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TArray<struct FWeaponInfo> defineItem;
+	TArray<struct FItemType> defineItem;
 };
