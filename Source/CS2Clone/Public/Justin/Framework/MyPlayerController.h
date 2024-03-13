@@ -22,6 +22,8 @@ public:
 protected:
 	virtual void BeginPlay() override; 
 
+	virtual void OnPossess(APawn* InPawn) override;
+
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Settings|UI")
 	TSubclassOf<UGameplayDisplay> GameplayDisplayClass;

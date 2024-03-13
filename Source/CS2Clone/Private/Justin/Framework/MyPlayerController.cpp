@@ -27,3 +27,21 @@ void AMyPlayerController::BeginPlay()
 	Super::BeginPlay();
 	DisplayGameplay();
 }
+
+void AMyPlayerController::OnPossess(APawn* InPawn)
+{
+	Super::OnPossess(InPawn);
+
+	if (HasAuthority())
+	{
+		const FString Test = GetWorld()->IsNetMode(NM_Client) ? TEXT("Client") : TEXT("Server");
+		GEngine->AddOnScreenDebugMessage(-1, 12.f, FColor::Red, FString::Printf(TEXT("HasAuthority. Net:%s. Pawn:%s"),
+			*Test, *GetNameSafe(InPawn)));
+	}
+	else
+	{
+		const FString Test = GetWorld()->IsNetMode(NM_Client) ? TEXT("Client") : TEXT("Server");
+		GEngine->AddOnScreenDebugMessage(-1, 12.f, FColor::Red, FString::Printf(TEXT("NoAuthority. Net:%s. Pawn:%s"),
+			*Test, *GetNameSafe(InPawn)));
+	}
+}

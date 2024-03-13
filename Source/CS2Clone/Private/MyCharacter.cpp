@@ -24,8 +24,12 @@ AMyCharacter::AMyCharacter()
 void AMyCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+	//MappingContext(); causes a crash because pawn in the server cannot get reference to playercontroller at first tick
 
-
+	if (IsLocallyControlled())
+	{
+		MappingContext();
+	}
 }
 
 // Called every frame
@@ -50,10 +54,16 @@ void AMyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	}
 }
 
-void AMyCharacter::PossessedBy(AController* NewController)
+/*void AMyCharacter::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
 
+
+}*/
+
+
+void AMyCharacter::MappingContext()
+{
 	//get APlayerController
 	APlayerController* playerContoller = Cast<APlayerController>(GetController());
 	//get subSystem
