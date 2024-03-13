@@ -4,17 +4,17 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "CGameplayActor.generated.h"
+#include "CGameplayItem.generated.h"
 
 class USkeletalMeshComponent;
 
 UCLASS()
-class CS2CLONE_API ACGameplayActor : public AActor
+class CS2CLONE_API ACGameplayItem : public AActor
 {
 	GENERATED_BODY()
 	
 public:	
-	ACGameplayActor();
+	ACGameplayItem();
 	UPROPERTY(EditDefaultsOnly, Category="Settings")
 	TObjectPtr<USkeletalMeshComponent> SKMComponent;
 	
