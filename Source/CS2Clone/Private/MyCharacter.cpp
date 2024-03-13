@@ -5,6 +5,9 @@
 #include <../../../../../../../Source/Runtime/Engine/Classes/Camera/CameraComponent.h>
 #include <../../../../../../../Source/Runtime/Engine/Classes/GameFramework/SpringArmComponent.h>
 #include "InventoryComponent.h"
+#include <../../../../../../../Source/Runtime/Engine/Classes/Kismet/GameplayStatics.h>
+#include "Justin/Base/CInteractableItem.h"
+#include "CSGameInstance.h"
 
 // Sets default values
 AMyCharacter::AMyCharacter()
@@ -92,6 +95,35 @@ void AMyCharacter::EnhancedLook(const struct FInputActionValue& value)
 
 void AMyCharacter::EnhancedGetDrop(const struct FInputActionValue& value)
 {
+	
 	UE_LOG(LogTemp, Warning, TEXT("f"));
+	//getitem()을 실행시킨다
+	GetItem();
+
+}
+
+void AMyCharacter::GetItem()
+{
+	//충돌 검사를 한다
+	// allItem 값까지 반복
+	//for (int32 i = 0; i < InteractItem.Num(); i++)
+	//{	
+	//	//아이템 거리는 아이템의 거리와 플레이어의 거리
+	//	float dist = FVector::Distance(GetActorLocation(), InteractItem[i]->GetActorLocation());
+	//
+	//	// 내가 아이템 집을수 있는지
+	//	if (dist < InteractItem[i]->TakeItemDistance)
+	//	{
+	//		
+	//	}
+	//}
+	//만약 범위안에서 입력을 받았다면
+
+	
+	//게임 인스턴스 가져오기
+	//UCSGameInstance* gameInstance = Cast<UCSGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
+	//인벤 컴포넌트에
+	//invenComp->myItems.Add(gameInstance->defineItem[slotType]);
+
 }
 
