@@ -28,10 +28,10 @@ void ACInteractableItem::BeginPlay()
 
 	if (ensure(DT_Weapons))
 	{
-		FWeaponInfo* Info = DT_Weapons->FindRow<FWeaponInfo>(WeaponNameTag.GetTagName(), FString::Printf(TEXT("")));
+		FItemType* Info = DT_Weapons->FindRow<FItemType>(WeaponNameTag.GetTagName(), FString::Printf(TEXT("")));
 		if (ensure(Info))
 		{
-			WeaponInfo = *Info;
+			ItemInfo = *Info;
 		}
 	}
 }
