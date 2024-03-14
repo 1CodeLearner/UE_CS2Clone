@@ -12,9 +12,9 @@ class UTexture2D;
 
 
 UENUM(BlueprintType)
-enum class EInventorySlotType
+enum class EInventorySlotType : uint8
 {
-	INV_PRIMARY UMETA(DisplayName="Primary"),
+	INV_PRIMARY UMETA(DisplayName="Primary") ,
 	INV_SECONDARY UMETA(DisplayName="Secondary"),
 	INV_MELEE UMETA(DisplayName="Melee"),
 	INV_UTILITY UMETA(DisplayName="Utility"),

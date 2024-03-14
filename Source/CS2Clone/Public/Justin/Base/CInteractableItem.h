@@ -35,11 +35,19 @@ protected:
 	UPROPERTY(EditAnywhere, Category=Settings)
 	TObjectPtr<UDataTable> DT_Weapons;
 
-	//¹«
+	
 	UPROPERTY(VisibleAnywhere, Category = Settings)
 	FItemType ItemInfo;
+
 
 	UFUNCTION()
 	void OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, 
 		int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
+
+public:
+	UPROPERTY(EditAnywhere)
+	float TakeItemDistance = 200;
+
+	UPROPERTY(EditAnywhere)
+	EInventorySlotType SlotType;
 };

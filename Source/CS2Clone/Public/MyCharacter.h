@@ -6,6 +6,9 @@
 #include "GameFramework/Character.h"
 #include "MyCharacter.generated.h"
 
+//인벤토리 슬롯 타입 전방선언
+enum class EInventorySlotType : uint8;
+
 UCLASS()
 class CS2CLONE_API AMyCharacter : public ACharacter
 {
@@ -38,11 +41,25 @@ public:
 	class UInputAction* ia_Look;
 	UPROPERTY(EditAnywhere)
 	class UInputAction* ia_Jump;
+	UPROPERTY(EditAnywhere)
+	class UInputAction* ia_GetDrop;
+	UPROPERTY(EditAnywhere)
+	class UInputAction* ia_InputItemSlot;
 
-	
+	UPROPERTY(EditAnywhere)
+	class UInventoryComponent* invenComp;
 
+	//camera
+	UPROPERTY(EditAnywhere)
+	class UCameraComponent* camera;
 public:
 	void EnhancedMove(const struct FInputActionValue& value);
 	void EnhancedJump(const struct FInputActionValue& value);
 	void EnhancedLook(const struct FInputActionValue& value);
+	void EnhancedGetDrop(const struct FInputActionValue& value);
+	void InputItemSlot(const struct FInputActionValue& value);
+
+public:
+	void GetItem(EInventorySlotType slotType);
+
 };
