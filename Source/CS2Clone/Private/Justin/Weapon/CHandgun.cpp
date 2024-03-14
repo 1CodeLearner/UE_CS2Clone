@@ -6,6 +6,8 @@
 #include "Net/UnrealNetwork.h"
 #include "GameFramework/Character.h"
 #include "Justin/ItemTypes.h"
+#include "Kismet/GameplayStatics.h"
+#include "MyCharacter.h"
 
 ACHandgun::ACHandgun()
 {
@@ -21,10 +23,10 @@ void ACHandgun::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if(ensure(DT_Weapon) && ensure(WeaponTag.IsValid()))
+	if (ensure(DT_Weapon) && ensure(WeaponTag.IsValid()))
 	{
-		FWeapon* weaponInfo =  DT_Weapon->FindRow<FWeapon>(WeaponTag.GetTagName(), FString::Printf(TEXT("")));
-		if(weaponInfo)
+		FWeapon* weaponInfo = DT_Weapon->FindRow<FWeapon>(WeaponTag.GetTagName(), FString::Printf(TEXT("")));
+		if (weaponInfo)
 		{
 			ReserveTotalRounds = weaponInfo->ReserveTotalRounds;
 			InMagTotalRounds = weaponInfo->InMagTotalRounds;
@@ -45,7 +47,7 @@ void ACHandgun::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 	GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Black,
-	                                 FString::Printf(TEXT("Owner: %s"), *GetNameSafe(GetOwner())));
+		FString::Printf(TEXT("Owner: %s"), *GetNameSafe(GetOwner())));
 
 	if (GetWorld()->IsNetMode(NM_Client))
 	{
@@ -58,7 +60,7 @@ void ACHandgun::Tick(float DeltaSeconds)
 	GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Black, FString::Printf(TEXT("Reserve: %d"), ReserveTotalRounds));
 	GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Black, FString::Printf(TEXT("Total: %d"), InMagTotalRounds));
 	GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Black,
-	                                 FString::Printf(TEXT("Remaining: %d"), InMagRemainingRounds));
+		FString::Printf(TEXT("Remaining: %d"), InMagRemainingRounds));
 }
 
 bool ACHandgun::CanReload() const
@@ -68,13 +70,18 @@ bool ACHandgun::CanReload() const
 
 void ACHandgun::Reload()
 {
-	ServerReload();
+	if (CanReload())
+	{
+		SKMComponent->PlayAnimation(ReloadAnimSeq, false);
+		//Temporary timer
+		FTimerHandle Handle;
+		GetWorld()->GetTimerManager().SetTimer(Handle, this, &ACHandgun::Server_Reload, 2.f, false);
+	}
 }
 
-void ACHandgun::ServerReload_Implementation()
+void ACHandgun::Server_Reload_Implementation()
 {
 	ensure(CanReload());
-
 	int refillAmt = InMagTotalRounds - InMagRemainingRounds;
 
 	int ReserveTemp = ReserveTotalRounds - refillAmt;
@@ -96,8 +103,34 @@ bool ACHandgun::CanFire() const
 
 void ACHandgun::Fire()
 {
-	ensure(CanFire());
+	//get actor that was hit
+	FHitResult Hit;
+	AActor* camera = UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0);
 
+	if (CanFire() && ensure(FireAnimSeq) && camera)
+	{
+		SKMComponent->PlayAnimation(FireAnimSeq, false);
+		FVector Start = camera->GetActorLocation();
+		FVector End = Start + camera->GetActorForwardVector() * 50000.f;
+		FCollisionQueryParams params;
+		params.AddIgnoredActor(GetOwner() ? GetOwner() : this);
+		bool bHit = GetWorld()->LineTraceSingleByChannel(Hit, Start, End, ECC_Visibility, params);
+		AMyCharacter* character = nullptr;
+		if (bHit)
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Black, FString::Printf(TEXT("HitActor: %s"), *GetNameSafe(Hit.GetActor())));
+			//if hit actor was player, send a server RPC
+			character = Cast<AMyCharacter>(Hit.GetActor());
+		}
+
+		Server_Fire(character, Hit);
+		DrawDebugLine(GetWorld(), Start, End, FColor::Black, false, 2.f);
+	}
+}
+
+void ACHandgun::Server_Fire_Implementation(AActor* ActorHit, FHitResult Hit)
+{
+	ensure(CanFire());
 	InMagRemainingRounds--;
 
 	if (InMagRemainingRounds < 0)

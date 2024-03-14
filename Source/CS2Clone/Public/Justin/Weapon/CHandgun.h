@@ -8,6 +8,7 @@
 #include "CHandgun.generated.h"
 
 class UDataTable;
+class UAnimSequence;
 
 //For UI update only 
 DECLARE_DYNAMIC_DELEGATE(FWeaponUpdateDelegate);
@@ -26,15 +27,15 @@ public:
 	bool CanReload() const;
 	UFUNCTION(BlueprintCallable, Category = "Settings|Test")
 	void Reload();
-
 	UFUNCTION(Server, Reliable)
-	void ServerReload();
-	void ServerReload_Implementation();
+	void Server_Reload();
 
 	UFUNCTION(BlueprintCallable, Category = "Settings|Test")
 	bool CanFire() const;
 	UFUNCTION(BlueprintCallable, Category = "Settings|Test")
 	void Fire();
+	UFUNCTION(Server, Reliable)
+	void Server_Fire(AActor* ActorHit, FHitResult Hit);
 
 protected:
 	virtual void BeginPlay() override;
@@ -45,6 +46,10 @@ protected:
 	FGameplayTag WeaponTag;
 	UPROPERTY(EditDefaultsOnly, Category="Settings|Init")
 	TObjectPtr<UDataTable> DT_Weapon;
+	UPROPERTY(EditDefaultsOnly, Category="Settings|Animation")
+	TObjectPtr<UAnimSequence> FireAnimSeq;
+		UPROPERTY(EditDefaultsOnly, Category="Settings|Animation")
+	TObjectPtr<UAnimSequence> ReloadAnimSeq;
 
 private:
 	UPROPERTY(VisibleAnywhere, Replicated, Category="Settings|Rounds")
