@@ -37,11 +37,11 @@ struct FItemType: public FTableRowBase
 		GameplayItemClass = nullptr;
 	}
 
-	//Spawn할때 DataTable row name 에 쓰여진다
+	//Spawn 할때 DataTable row name 에 쓰여진다
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Item")
 	FGameplayTag ItemNameTag;
 
-	//UI에 쓸 단어
+	//player UI 에 쓸 단어
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Item")
 	FText DisplayName;
 
@@ -61,7 +61,7 @@ struct FItemType: public FTableRowBase
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
 	TSubclassOf<ACInteractableItem> DroppedItemClass;
 
-	//플레이어가 집적 handle 하는 Actor
+	//플레이어가 직접 쓰는 하는 Actor
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
 	TSubclassOf<ACGameplayItem> GameplayItemClass;
 };
@@ -73,6 +73,7 @@ enum class EWeaponType
 	PISTOL UMETA(DisplayName="Pistol")
 };
 
+//무기 actor 마다 들어가는 정보
 USTRUCT(BlueprintType)
 struct FWeapon : public FTableRowBase
 {

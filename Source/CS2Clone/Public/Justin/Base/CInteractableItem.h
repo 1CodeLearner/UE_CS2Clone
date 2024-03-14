@@ -29,14 +29,16 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Settings")
 	TObjectPtr<UBoxComponent> BoxComp;
 
-	UPROPERTY(EditAnywhere, Category=Settings)
-	FGameplayTag WeaponNameTag;
+	//FGameplayTag 의 FName 으로 DataTable(FItemType) 정보를 빼온다 
+	UPROPERTY(EditAnywhere, Category="Settings | Items")
+	FGameplayTag ItemNameTag;
 
-	UPROPERTY(EditAnywhere, Category=Settings)
-	TObjectPtr<UDataTable> DT_Weapons;
+	//DataTable of FItemType 
+	UPROPERTY(EditAnywhere, Category= "Settings | Items")
+	TObjectPtr<UDataTable> DT_Items;
 
-	
-	UPROPERTY(VisibleAnywhere, Category = Settings)
+	//정보를 저장하고 플레이어와 접촉할때 프레이어 인벤토리에 들어간다
+	UPROPERTY(VisibleAnywhere, Category= "Settings | Items")
 	FItemType ItemInfo;
 
 

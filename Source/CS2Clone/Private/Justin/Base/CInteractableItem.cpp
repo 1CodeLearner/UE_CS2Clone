@@ -26,22 +26,22 @@ void ACInteractableItem::BeginPlay()
 
 	BoxComp->OnComponentBeginOverlap.AddDynamic(this, &ACInteractableItem::OnOverlapBegin);
 
-	UE_LOG(LogTemp, Warning, TEXT("Tag Name: %s"), *WeaponNameTag.GetTagName().ToString());
+	UE_LOG(LogTemp, Warning, TEXT("Tag Name: %s"), *ItemNameTag.GetTagName().ToString());
 
-	if (ensure(DT_Weapons))
+	if (ensure(DT_Items))
 	{
-		FItemType* Info = DT_Weapons->FindRow<FItemType>(WeaponNameTag.GetTagName(), FString::Printf(TEXT("")));
+		FItemType* Info = DT_Items->FindRow<FItemType>(ItemNameTag.GetTagName(), FString::Printf(TEXT("")));
 		if (ensure(Info))
 		{
 			ItemInfo = *Info;
 		}
 	}
-	//ItemInfo.ItemNameTag == WeaponNameTag;
+	//ItemInfo.ItemNameTag == ItemNameTag;
 }
 
 void ACInteractableItem::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	//FItemType* SlotType = DT_Weapons->FindRow<FItemType>(WeaponNameTag.GetTagName(), FString::Printf(TEXT("")));
+	//FItemType* SlotType = DT_Items->FindRow<FItemType>(ItemNameTag.GetTagName(), FString::Printf(TEXT("")));
 	//int32 ConversionInfo = (int32)SlotType;
 
 	//인벤토리 컴포넌트 가져오기
