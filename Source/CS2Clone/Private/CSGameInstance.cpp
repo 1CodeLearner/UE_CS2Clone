@@ -22,7 +22,7 @@ UCSGameInstance::UCSGameInstance()
 			FItemType* itemData = dataTable->FindRow<FItemType>(rowNames[i], TEXT(""));
 
 			//defineItem.Add(*itemData);
-			//아이템정의 배열에 itemData를 푸쉬
+			//아이템정의 배열에 itemData를 순차적으로 집어넣기 
 			defineItem[i] = *itemData;
 		}
 	}

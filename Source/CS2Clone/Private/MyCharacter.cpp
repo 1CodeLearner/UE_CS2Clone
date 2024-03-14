@@ -30,6 +30,7 @@ AMyCharacter::AMyCharacter()
 	//springArm->SetupAttachment(RootComponent);
 	camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	camera->SetupAttachment(RootComponent);
+	camera->SetWorldLocation(FVector(30, 0, 80));
 
 	//invencomp
 	invenComp = CreateDefaultSubobject<UInventoryComponent>(TEXT("PlayerInventory"));
