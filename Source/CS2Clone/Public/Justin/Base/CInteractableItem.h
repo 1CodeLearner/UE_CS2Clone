@@ -22,6 +22,7 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+	
 
 	UPROPERTY(EditDefaultsOnly, Category="Settings")
 	TObjectPtr<UStaticMeshComponent> SMComp;

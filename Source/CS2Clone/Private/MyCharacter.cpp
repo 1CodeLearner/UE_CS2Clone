@@ -110,41 +110,46 @@ void AMyCharacter::InputItemSlot(const struct FInputActionValue& value)
 	int32 slotIdx = value.Get<float>();
 	slotIdx--;
 
-	//UE_LOG(LogTemp, Warning, TEXT("get value : %.d"), slotIdx);
+	UE_LOG(LogTemp, Warning, TEXT("get value : %d"), slotIdx);
 	GetItem((EInventorySlotType)slotIdx);
 }
 
+// old version
 void AMyCharacter::GetItem(EInventorySlotType slotType)
 {
+	FName slotName = UEnum::GetValueAsName<EInventorySlotType>(slotType);
+	UE_LOG(LogTemp, Warning, TEXT("slotName : %s"), *slotName.ToString());
 	// 열거형을 인트형으로 형변환
 	int32 invenSlotType = (int32)slotType;
 
+	
+	// 1. 아이템 슬롯 중복 되면 안되고 인벤 배열이 5이상 되면 들어오지않도록
+	
 	// 게임 인스턴스 가져오기
 	UCSGameInstance* gameInstance = Cast<UCSGameInstance>(GetWorld()->GetGameInstance());
 	
-	invenComp->myItems.Add(gameInstance->defineItem[invenSlotType]);
+	//invenComp->myItems.Add(gameInstance->defineItem[invenSlotType]);
+	invenComp->myItems[invenSlotType] = gameInstance->defineItem[invenSlotType];
+	// 가지고있는것중에 0보다 크면 return //or nullptr; 
 
-	//충돌 검사를 한다
-	// allItem 값까지 반복
-	//for (int32 i = 0; i < InteractItem.Num(); i++)
-	//{	
-	//	//아이템 거리는 아이템의 거리와 플레이어의 거리
-	//	float dist = FVector::Distance(GetActorLocation(), InteractItem[i]->GetActorLocation());
-	//
-	//	// 내가 아이템 집을수 있는지
-	//	if (dist < InteractItem[i]->TakeItemDistance)
-	//	{
-	//		
-	//	}
-	//}
-	//만약 범위안에서 입력을 받았다면
-
-	
 	//게임 인스턴스 가져오기
 	//UCSGameInstance* gameInstance = Cast<UCSGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
 	//인벤 컴포넌트에
 	//invenComp->myItems.Add(gameInstance->defineItem[slotType]);
 
 
+}
+
+//new version
+bool AMyCharacter::GetItem(FItemType itemInfo)
+{
+	// 인벤토리에서 몇번째 자리에 들어가야하는지?
+	int32 invenSlotType = (int32)(itemInfo.InventorySlotType);
+
+	if(invenComp->myItems[invenSlotType].InventorySlotType != EInventorySlotType::INV_MAX) return false;
+
+	invenComp->myItems[invenSlotType] = itemInfo;
+
+	return true;
 }
 

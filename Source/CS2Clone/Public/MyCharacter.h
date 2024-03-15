@@ -59,7 +59,7 @@ public:
 	void EnhancedGetDrop(const struct FInputActionValue& value);
 	void InputItemSlot(const struct FInputActionValue& value);
 
-public:
 	void GetItem(EInventorySlotType slotType);
+	bool GetItem(struct FItemType itemInfo);
 
 };

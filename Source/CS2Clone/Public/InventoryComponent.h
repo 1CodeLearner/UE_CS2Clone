@@ -29,4 +29,6 @@ public:
 	UPROPERTY(EditAnywhere)
 	TArray<FItemType> myItems;
 
+	UPROPERTY(EditAnywhere)
+	TArray<EInventorySlotType> slotType;
 };

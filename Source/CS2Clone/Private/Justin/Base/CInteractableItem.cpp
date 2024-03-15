@@ -34,16 +34,20 @@ void ACInteractableItem::BeginPlay()
 		if (ensure(Info))
 		{
 			ItemInfo = *Info;
+
 		}
 	}
 	//ItemInfo.ItemNameTag == ItemNameTag;
+	
+	//EInventorySlotType::GetDisplayNameTextByIndex
+	//ItemInfo.ItemNameTag.GetTagName().
 }
 
 void ACInteractableItem::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	//FItemType* SlotType = DT_Items->FindRow<FItemType>(ItemNameTag.GetTagName(), FString::Printf(TEXT("")));
 	//int32 ConversionInfo = (int32)SlotType;
-
+	//int32 enum 캐스트 
 	//인벤토리 컴포넌트 가져오기
 	UInventoryComponent* inven = OtherActor->GetComponentByClass<UInventoryComponent>();
 	// otherActor에 player추가 => 플레이어랑 충돌나면
@@ -56,15 +60,15 @@ void ACInteractableItem::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent
 	{
 		UE_LOG(LogTemp, Warning, TEXT("choong"));
 		// 사라져라
-		Destroy();
 		
 		//인벤에 이 아이템 정보 넣어라
 		//player->GetItem((EInventorySlotType) EInventorySlotType::INV_PRIMARY);
-		//player->GetItem(SlotType);
+		bool isGetItem = player->GetItem(ItemInfo);
 		//inven->myItems.Add(gameInstance->defineItem[]);
 		// 포문으로 돌려 / 아이템 인포랑 같은지, ItemNameTag로 (FGameplayTag)
 		// 같으면 그 인덱스를 저장
 		// break 해라 
+		if(isGetItem)	Destroy();
 
 	}
 	else

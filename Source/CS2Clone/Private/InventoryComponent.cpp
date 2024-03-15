@@ -2,6 +2,7 @@
 
 
 #include "InventoryComponent.h"
+#include "CSGameInstance.h"
 
 // Sets default values for this component's properties
 UInventoryComponent::UInventoryComponent()
@@ -10,7 +11,9 @@ UInventoryComponent::UInventoryComponent()
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
 
-	
+	// 플레이어 인벤 비어있는 5칸 생성 
+	myItems.Init(FItemType(), 5);
+
 }
 
 
@@ -19,7 +22,18 @@ void UInventoryComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// ...
+
+
+
+
+	//for (int32 i = 0; i < myItems.Num(); i++)
+	//{
+	//	myItems.Add(FItemType.);
+	//}
+	
+	
+	//myItems.Add((FItemType::InventorySlotType));
+	
 	
 }
 

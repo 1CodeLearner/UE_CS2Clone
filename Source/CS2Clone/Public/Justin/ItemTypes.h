@@ -13,13 +13,13 @@ class UTexture2D;
 
 UENUM(BlueprintType)
 enum class EInventorySlotType : uint8
-{
+{	
 	INV_PRIMARY UMETA(DisplayName="Primary") ,
 	INV_SECONDARY UMETA(DisplayName="Secondary"),
 	INV_MELEE UMETA(DisplayName="Melee"),
 	INV_UTILITY UMETA(DisplayName="Utility"),
 	INV_BOMB UMETA(DisplayName="Bomb"),
-	INV_MAX UMETA(DisplayName="Max")
+	INV_MAX UMETA(Hidden)
 };
 
 USTRUCT(BlueprintAble)
