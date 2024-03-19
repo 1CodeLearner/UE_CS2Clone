@@ -19,8 +19,6 @@ class CS2CLONE_API ACHandgun : public ACGameplayItem
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditAnywhere)
-	APawn* OwnerTest;
 	ACHandgun();
 	//UI 업대이트를 위한 delegate
 	FWeaponUpdateDelegate OnWeaponUpdate;
@@ -36,6 +34,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Settings|Test")
 	void Fire();
 	//
+
+	float timerTotal = 5.f; 
+	float currTime = 0.f;
 
 protected:
 	virtual void BeginPlay() override;

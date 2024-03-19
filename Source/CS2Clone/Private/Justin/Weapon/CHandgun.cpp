@@ -12,7 +12,7 @@
 ACHandgun::ACHandgun()
 {
 	PrimaryActorTick.bCanEverTick = true;
-	SetReplicates(true);
+	bReplicates = true;
 	ReserveTotalRounds = 0;
 	InMagTotalRounds = 0;
 	InMagRemainingRounds = 0;
@@ -40,8 +40,6 @@ void ACHandgun::BeginPlay()
 	//if (ensure(PC)) 
 	//{
 	//}
-	if (OwnerTest)
-		SetOwner(OwnerTest);
 }
 
 void ACHandgun::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -60,7 +58,18 @@ void ACHandgun::Tick(float DeltaSeconds)
 	//총 정보 출력
 	LogGunState();
 
-
+	currTime += DeltaSeconds;
+	if (currTime > timerTotal) 
+	{
+		if (!GetOwner())
+		{
+			for (TActorIterator<ACharacter> it(GetWorld()); it; ++it)
+			{
+				SetOwner(*it);
+			}
+		}
+		currTime = timerTotal;
+	}
 }
 
 void ACHandgun::LogGunState()
@@ -70,11 +79,11 @@ void ACHandgun::LogGunState()
 
 	if (GetWorld()->IsNetMode(NM_Client))
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Black, FString::Printf(TEXT("Client")));
+		GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Black, FString::Printf(TEXT("Client - Owner: %s"), *GetNameSafe(GetOwner())));
 	}
 	else
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Black, FString::Printf(TEXT("Server")));
+		GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Black, FString::Printf(TEXT("Server - Owner: %s"), *GetNameSafe(GetOwner())));
 	}
 
 	//소지품에 남은 총알 
@@ -173,7 +182,6 @@ void ACHandgun::Fire()
 		DrawDebugLine(GetWorld(), Start, End, FColor::Black, false, 2.f);
 	}
 }
-
 
 void ACHandgun::Server_Fire_Implementation(AActor* ActorHit, FHitResult Hit)
 {
