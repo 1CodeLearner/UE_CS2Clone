@@ -19,6 +19,8 @@ class CS2CLONE_API ACHandgun : public ACGameplayItem
 	GENERATED_BODY()
 
 public:
+	UPROPERTY(EditAnywhere)
+	APawn* OwnerTest;
 	ACHandgun();
 	//UI 업대이트를 위한 delegate
 	FWeaponUpdateDelegate OnWeaponUpdate;
@@ -66,5 +68,8 @@ private:
 	UPROPERTY(VisibleAnywhere, Replicated, Category="Settings|Rounds")
 	int InMagRemainingRounds;
 
+	bool bClientReloading;
+	UFUNCTION(Client, Reliable)
+	void Client_ReloadComplete();
 	void LogGunState();
 };

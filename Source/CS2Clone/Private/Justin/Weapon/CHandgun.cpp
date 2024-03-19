@@ -16,6 +16,7 @@ ACHandgun::ACHandgun()
 	ReserveTotalRounds = 0;
 	InMagTotalRounds = 0;
 	InMagRemainingRounds = 0;
+	bClientReloading = false;
 }
 
 
@@ -34,6 +35,13 @@ void ACHandgun::BeginPlay()
 			InMagRemainingRounds = InMagTotalRounds;
 		}
 	}
+
+	//APlayerController* PC = GetWorld()->GetFirstPlayerController();
+	//if (ensure(PC)) 
+	//{
+	//}
+	if (OwnerTest)
+		SetOwner(OwnerTest);
 }
 
 void ACHandgun::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -47,7 +55,7 @@ void ACHandgun::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetim
 void ACHandgun::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
-	
+
 
 	//총 정보 출력
 	LogGunState();
@@ -80,8 +88,8 @@ void ACHandgun::LogGunState()
 
 bool ACHandgun::CanReload() const
 {
-	//탄창이 채워지지 않았을 경우 + 예비 탄약이 있을 경우
-	return InMagRemainingRounds != InMagTotalRounds && ReserveTotalRounds != 0;
+	//탄창이 채워지지 않았을 경우 && 예비 탄약이 있을 경우 && 재장전 하고 있지 않은 경우
+	return InMagRemainingRounds != InMagTotalRounds && ReserveTotalRounds != 0 && !bClientReloading;
 }
 
 //이 함수로 장전
@@ -93,12 +101,19 @@ void ACHandgun::Reload()
 		//Temporary timer
 		FTimerHandle Handle;
 		GetWorld()->GetTimerManager().SetTimer(Handle, this, &ACHandgun::Server_Reload, 2.f, false);
+		UE_LOG(LogTemp, Warning, TEXT("Owner: %s"), *GetNameSafe(GetOwner()));
+		bClientReloading = true;
 	}
 }
 
+void ACHandgun::Client_ReloadComplete_Implementation()
+{
+	bClientReloading = false;
+}
+
+
 void ACHandgun::Server_Reload_Implementation()
 {
-	ensure(CanReload());
 	int refillAmt = InMagTotalRounds - InMagRemainingRounds;
 
 	int ReserveTemp = ReserveTotalRounds - refillAmt;
@@ -111,11 +126,13 @@ void ACHandgun::Server_Reload_Implementation()
 		ReserveTotalRounds = ReserveTemp;
 
 	InMagRemainingRounds += refillAmt;
+	Client_ReloadComplete();
 }
 
 bool ACHandgun::CanFire() const
 {
-	return InMagRemainingRounds > 0;
+	//탄창에 총알이 있을때 && reloading 하고 있지 않을때
+	return InMagRemainingRounds > 0 && !bClientReloading;
 }
 
 //이 함수로 쏜다
@@ -128,12 +145,12 @@ void ACHandgun::Fire()
 	{
 		//총 쏘는 애니매이션
 		SKMComponent->PlayAnimation(FireAnimSeq, false);
-		
+
 		FVector Start = camera->GetActorLocation();
 		FVector End = Start + camera->GetActorForwardVector() * 50000.f;
 		FCollisionQueryParams params;
 		params.AddIgnoredActor(GetOwner() ? GetOwner() : this);
-		
+
 		//AMyCharacter를 찾는 Line trace 
 		bool bHit = GetWorld()->LineTraceSingleByChannel(Hit, Start, End, ECC_Visibility, params);
 		AMyCharacter* character = nullptr;
@@ -143,8 +160,15 @@ void ACHandgun::Fire()
 			//if hit actor was player, send a server RPC
 			character = Cast<AMyCharacter>(Hit.GetActor());
 		}
-		
+
 		//발사 되어서 서버에 총 정보 처리하기
+		if (HasAuthority())
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Server?: %s"), *GetNameSafe(GetOwner()));
+		}
+		else {
+			UE_LOG(LogTemp, Warning, TEXT("Client?: %s"), *GetNameSafe(GetOwner()));
+		}
 		Server_Fire(character, Hit);
 		DrawDebugLine(GetWorld(), Start, End, FColor::Black, false, 2.f);
 	}
@@ -153,7 +177,6 @@ void ACHandgun::Fire()
 
 void ACHandgun::Server_Fire_Implementation(AActor* ActorHit, FHitResult Hit)
 {
-	ensure(CanFire());
 	InMagRemainingRounds--;
 
 	if (InMagRemainingRounds < 0)
