@@ -67,8 +67,8 @@ void AMyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 		enhancedInputComponent->BindAction(ia_Move, ETriggerEvent::Triggered, this, &AMyCharacter::EnhancedMove);
 		enhancedInputComponent->BindAction(ia_Jump, ETriggerEvent::Triggered, this, &AMyCharacter::EnhancedJump);
 		enhancedInputComponent->BindAction(ia_Look, ETriggerEvent::Triggered, this, &AMyCharacter::EnhancedLook);
-		enhancedInputComponent->BindAction(ia_GetDrop, ETriggerEvent::Started, this, &AMyCharacter::EnhancedGetDrop);
-		enhancedInputComponent->BindAction(ia_InputItemSlot, ETriggerEvent::Started, this, &AMyCharacter::InputItemSlot);
+		enhancedInputComponent->BindAction(ia_GetDrop, ETriggerEvent::Started, this, &AMyCharacter::EnhancedDrop);
+		enhancedInputComponent->BindAction(ia_InputItemSlot, ETriggerEvent::Started, this, &AMyCharacter::SelectItem);
 	}
 }
 
@@ -95,30 +95,40 @@ void AMyCharacter::EnhancedLook(const struct FInputActionValue& value)
 
 }
 
-void AMyCharacter::EnhancedGetDrop(const struct FInputActionValue& value)
+void AMyCharacter::EnhancedDrop(const struct FInputActionValue& value)
 {
 	
 	UE_LOG(LogTemp, Warning, TEXT("f"));
-	//getitem()을 실행시킨다
-	//GetItem();
-
+	//GetWorld()->SpawnActor<ACInteractableItem>(invenComp->myItems[], GetActorLocation(), GetActorRotation());
+	//가지고 있는 아이템의 정보를 none 으로 바꿔치기해보자
+	//invenComp->myItems.e
+	//DropItem();
 }
 
-void AMyCharacter::InputItemSlot(const struct FInputActionValue& value)
+void AMyCharacter::SelectItem(const struct FInputActionValue& value)
 {
 	//input 입력값 가져와
 	int32 slotIdx = value.Get<float>();
 	slotIdx--;
 
-	UE_LOG(LogTemp, Warning, TEXT("get value : %d"), slotIdx);
-	GetItem((EInventorySlotType)slotIdx);
+	//슬롯 인덱스와 내 아이템 연동 / 인벤토리슬롯으로
+	EInventorySlotType HaveItemSlot = invenComp->myItems[slotIdx].InventorySlotType;
+
+	// 내 아이템 슬롯에 아이템이 없으면 리턴
+	if(HaveItemSlot == EInventorySlotType::INV_MAX) return;
+	
+	UE_LOG(LogTemp, Warning, TEXT("item : %d"), HaveItemSlot);
+	
+	
+	//선택한 아이템의 기능을 사용할 수 있는 함수를 호출
+
 }
 
 // old version
 void AMyCharacter::GetItem(EInventorySlotType slotType)
 {
-	FName slotName = UEnum::GetValueAsName<EInventorySlotType>(slotType);
-	UE_LOG(LogTemp, Warning, TEXT("slotName : %s"), *slotName.ToString());
+	//FName slotName = UEnum::GetValueAsName<EInventorySlotType>(slotType);
+	//UE_LOG(LogTemp, Warning, TEXT("slotName : %s"), *slotName.ToString());
 	// 열거형을 인트형으로 형변환
 	int32 invenSlotType = (int32)slotType;
 
@@ -144,12 +154,29 @@ void AMyCharacter::GetItem(EInventorySlotType slotType)
 bool AMyCharacter::GetItem(FItemType itemInfo)
 {
 	// 인벤토리에서 몇번째 자리에 들어가야하는지?
+	// 슬롯타입 정보 담아놓고 형변환
 	int32 invenSlotType = (int32)(itemInfo.InventorySlotType);
 
+	//만약 인벤에 있는 아이템 배열에서 아이템 타입이 max가 아니면 false 리턴 
+	//같은 슬롯타입에 아이템을 갖고있으면 안됨 
 	if(invenComp->myItems[invenSlotType].InventorySlotType != EInventorySlotType::INV_MAX) return false;
 
-	invenComp->myItems[invenSlotType] = itemInfo;
-
+	//내 인벤 슬롯 타입에 충돌체 아이템정보 추가
+	invenComp->myItems[invenSlotType] = itemInfo; 
 	return true;
+}
+
+void AMyCharacter::DropItem(FItemType itemInfo)
+{
+	int32 WantDropItem = (int32)(itemInfo.InventorySlotType);
+
+	//슬롯 비어있으면 리턴
+	if (invenComp->myItems[WantDropItem].InventorySlotType != EInventorySlotType::INV_MAX) return;
+
+	//invenComp->myItems
+
+	//UE_LOG(LogTemp, Warning, TEXT(""));
+	//SelectItem(WantDropItem);
+	//invenComp->myItems[]
 }
 

@@ -49,6 +49,11 @@ public:
 	UPROPERTY(EditAnywhere)
 	class UInventoryComponent* invenComp;
 
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class ACInteractableItem> itemFactory;
+	
+	
+
 	//camera
 	UPROPERTY(EditAnywhere)
 	class UCameraComponent* camera;
@@ -56,10 +61,11 @@ public:
 	void EnhancedMove(const struct FInputActionValue& value);
 	void EnhancedJump(const struct FInputActionValue& value);
 	void EnhancedLook(const struct FInputActionValue& value);
-	void EnhancedGetDrop(const struct FInputActionValue& value);
-	void InputItemSlot(const struct FInputActionValue& value);
+	void EnhancedDrop(const struct FInputActionValue& value);
+	void SelectItem(const struct FInputActionValue& value);
 
 	void GetItem(EInventorySlotType slotType);
 	bool GetItem(struct FItemType itemInfo);
 
+	void DropItem(struct FItemType itemInfo);
 };
