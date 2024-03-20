@@ -7,7 +7,7 @@
 #include "GameplayDisplay.generated.h"
 
 /**
- * 
+ *
  */
 
 class UTextBlock;
@@ -16,11 +16,10 @@ UCLASS()
 class CS2CLONE_API UGameplayDisplay : public UUserWidget
 {
 	GENERATED_BODY()
-	
+public:
 	void SetTime(float time);
 
-public: 
-	UPROPERTY(meta=(BindWidget))
+public:
+	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UTextBlock> TimeText;
-
 };
