@@ -9,6 +9,8 @@ AMyPlayerController::AMyPlayerController()
 	GameplayDisplayClass = nullptr;
 	GameplayDisplay = nullptr;
 	DeltaTime = 0.f;
+	DestTime = 10.f;
+	MarkedTime = 0.f;
 }
 
 void AMyPlayerController::DisplayGameplay()
@@ -26,7 +28,10 @@ void AMyPlayerController::DisplayGameplay()
 void AMyPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
-	DisplayGameplay();
+	if (IsLocalController()) 
+	{
+		DisplayGameplay();
+	}
 	if (!HasAuthority())
 	{
 		SendServerTimeRequest();
@@ -39,15 +44,31 @@ void AMyPlayerController::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
-	if (GameplayDisplay)
+	if (bStart && GameplayDisplay)
 	{
-		GameplayDisplay->SetTime(GetServerTime());
+		float remainingTime = DestTime - (MarkedTime + DeltaSeconds);		
+		if (remainingTime <= 0.f)
+		{
+			bStart = false;
+			GameplayDisplay->SetTime(0.f);
+		}
+		else {
+			GameplayDisplay->SetTime(remainingTime);
+			MarkedTime += DeltaSeconds;
+		}
 	}
 }
 
 void AMyPlayerController::SendServerTimeRequest()
 {
 	Server_RequestServerTime(GetWorld()->GetTimeSeconds());
+}
+
+void AMyPlayerController::StartTimer()
+{
+	MarkedTime = GetServerTime();
+	DestTime = MarkedTime + 2.f;
+	bStart = true;
 }
 
 float AMyPlayerController::GetServerTime() const
