@@ -59,7 +59,7 @@ void ACHandgun::Tick(float DeltaSeconds)
 	LogGunState();
 
 	currTime += DeltaSeconds;
-	if (currTime > timerTotal) 
+	if (currTime > timerTotal)
 	{
 		if (!GetOwner())
 		{
@@ -107,21 +107,27 @@ void ACHandgun::Reload()
 	if (CanReload())
 	{
 		SKMComponent->PlayAnimation(ReloadAnimSeq, false);
-		//Temporary timer
-		FTimerHandle Handle;
-		GetWorld()->GetTimerManager().SetTimer(Handle, this, &ACHandgun::Server_Reload, 2.f, false);
-		UE_LOG(LogTemp, Warning, TEXT("Owner: %s"), *GetNameSafe(GetOwner()));
 		bClientReloading = true;
+		Server_Reload();
 	}
 }
 
-void ACHandgun::Client_ReloadComplete_Implementation()
+void ACHandgun::Server_Reload_Implementation()
 {
-	bClientReloading = false;
+	FTimerHandle handle;
+	GetWorld()->GetTimerManager().SetTimer(handle, this, &ACHandgun::CompleteReload, 1.5f, false);
+	Multi_Reload();
 }
 
+void ACHandgun::Multi_Reload_Implementation()
+{
+	if (!SKMComponent->IsPlaying())
+	{
+		SKMComponent->PlayAnimation(ReloadAnimSeq, false);
+	}
+}
 
-void ACHandgun::Server_Reload_Implementation()
+void ACHandgun::CompleteReload()
 {
 	int refillAmt = InMagTotalRounds - InMagRemainingRounds;
 
@@ -135,7 +141,15 @@ void ACHandgun::Server_Reload_Implementation()
 		ReserveTotalRounds = ReserveTemp;
 
 	InMagRemainingRounds += refillAmt;
-	Client_ReloadComplete();
+
+	//Reset bool for server
+	bClientReloading = false;
+	Client_CompleteReload();
+}
+
+void ACHandgun::Client_CompleteReload_Implementation()
+{
+	bClientReloading = false;
 }
 
 bool ACHandgun::CanFire() const
@@ -189,4 +203,10 @@ void ACHandgun::Server_Fire_Implementation(AActor* ActorHit, FHitResult Hit)
 
 	if (InMagRemainingRounds < 0)
 		InMagRemainingRounds = 0;
+	Multi_Fire();
+}
+
+void ACHandgun::Multi_Fire_Implementation()
+{
+	SKMComponent->PlayAnimation(FireAnimSeq, false);
 }
