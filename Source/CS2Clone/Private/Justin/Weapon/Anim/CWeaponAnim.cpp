@@ -6,8 +6,6 @@
 
 void UCWeaponAnim::AnimNotify_Reload()
 {
-	ACHandgun* weapon = Cast<ACHandgun>(GetOwningActor());
-	weapon->Server_Reload();
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("22222222")));
 }
 
