@@ -54,11 +54,11 @@ void ACHandgun::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
-
 	//총 정보 출력
 	LogGunState();
 
-	currTime += DeltaSeconds;
+	//태스팅용 
+	/*currTime += DeltaSeconds;
 	if (currTime > timerTotal)
 	{
 		if (!GetOwner())
@@ -69,30 +69,31 @@ void ACHandgun::Tick(float DeltaSeconds)
 			}
 		}
 		currTime = timerTotal;
-	}
+	}*/
 }
 
 void ACHandgun::LogGunState()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Black,
-		FString::Printf(TEXT("Owner: %s"), *GetNameSafe(GetOwner())));
+	//태스팅용 
+	//GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Black,
+	//	FString::Printf(TEXT("Owner: %s"), *GetNameSafe(GetOwner())));
 
-	if (GetWorld()->IsNetMode(NM_Client))
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Black, FString::Printf(TEXT("Client - Owner: %s"), *GetNameSafe(GetOwner())));
-	}
-	else
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Black, FString::Printf(TEXT("Server - Owner: %s"), *GetNameSafe(GetOwner())));
-	}
+	//if (GetWorld()->IsNetMode(NM_Client))
+	//{
+	//	GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Black, FString::Printf(TEXT("Client - Owner: %s"), *GetNameSafe(GetOwner())));
+	//}
+	//else
+	//{
+	//	GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Black, FString::Printf(TEXT("Server - Owner: %s"), *GetNameSafe(GetOwner())));
+	//}
 
-	//소지품에 남은 총알 
-	GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Black, FString::Printf(TEXT("Reserve: %d"), ReserveTotalRounds));
-	//탄창 총 양
-	GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Black, FString::Printf(TEXT("Total: %d"), InMagTotalRounds));
-	//탄창안에 남은 종알
-	GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Black,
-		FString::Printf(TEXT("Remaining: %d"), InMagRemainingRounds));
+	////소지품에 남은 총알 
+	//GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Black, FString::Printf(TEXT("Reserve: %d"), ReserveTotalRounds));
+	////탄창 총 양
+	//GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Black, FString::Printf(TEXT("Total: %d"), InMagTotalRounds));
+	////탄창안에 남은 종알
+	//GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Black,
+	//	FString::Printf(TEXT("Remaining: %d"), InMagRemainingRounds));
 }
 
 bool ACHandgun::CanReload() const
@@ -199,6 +200,11 @@ void ACHandgun::Fire()
 
 void ACHandgun::Server_Fire_Implementation(AActor* ActorHit, FHitResult Hit)
 {
+	//플레이어가 맞았다면:
+	if(ActorHit)
+	{
+		//플레이어 체력 줄여라.
+	}
 	InMagRemainingRounds--;
 
 	if (InMagRemainingRounds < 0)

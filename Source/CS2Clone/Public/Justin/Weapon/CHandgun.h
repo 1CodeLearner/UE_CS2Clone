@@ -23,7 +23,7 @@ public:
 	//UI 업대이트를 위한 delegate
 	FWeaponUpdateDelegate OnWeaponUpdate;
 
-	//플레이어가 사용할 수 있는 기능
+	//플레이어 케릭터가 사용할 수 있는 기능
 	UFUNCTION(BlueprintCallable, Category = "Settings|Test")
 	bool CanReload() const;
 	UFUNCTION(BlueprintCallable, Category = "Settings|Test")
@@ -35,8 +35,9 @@ public:
 	void Fire();
 	//
 
-	float timerTotal = 5.f;
-	float currTime = 0.f;
+	//태스팅용: 무시
+	/*float timerTotal = 5.f;
+	float currTime = 0.f;*/
 
 protected:
 	virtual void BeginPlay() override;
@@ -49,27 +50,31 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Settings|Init")
 	TObjectPtr<UDataTable> DT_Weapon;
 
-	//Weapon Animation 
+	//애니메이션
 	UPROPERTY(EditDefaultsOnly, Category = "Settings|Animation")
 	TObjectPtr<UAnimSequence> FireAnimSeq;
 	UPROPERTY(EditDefaultsOnly, Category = "Settings|Animation")
 	TObjectPtr<UAnimSequence> ReloadAnimSeq;
 
+	//재장전
 	UFUNCTION(Server, Reliable)
 	void Server_Reload();
-	//Called only on server to reload
-	UFUNCTION()
-	void CompleteReload();
 	UFUNCTION(NetMulticast, Reliable)
 	void Multi_Reload();
+	UFUNCTION()
+	void CompleteReload(); //서버에서만 불러진다
+	UFUNCTION(Client, Reliable)
+	void Client_CompleteReload();
 
+
+	//발사
 	UFUNCTION(Server, Reliable)
 	void Server_Fire(AActor* ActorHit, FHitResult Hit);
-	
 	UFUNCTION(NetMulticast, Reliable)
 	void Multi_Fire();
 
 private:
+	//총 정보
 	UPROPERTY(VisibleAnywhere, Replicated, Category = "Settings|Rounds")
 	int ReserveTotalRounds;
 	UPROPERTY(VisibleAnywhere, Category = "Settings|Rounds")
@@ -77,8 +82,8 @@ private:
 	UPROPERTY(VisibleAnywhere, Replicated, Category = "Settings|Rounds")
 	int InMagRemainingRounds;
 
+	//클라이언트가 재장전 하고 있는지 확인
 	bool bClientReloading;
-	UFUNCTION(Client, Reliable)
-	void Client_CompleteReload();
+	//출력
 	void LogGunState();
 };
