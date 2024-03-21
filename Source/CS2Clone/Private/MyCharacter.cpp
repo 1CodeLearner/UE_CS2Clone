@@ -8,6 +8,7 @@
 #include <../../../../../../../Source/Runtime/Engine/Classes/Kismet/GameplayStatics.h>
 #include "Justin/Base/CInteractableItem.h"
 #include "CSGameInstance.h"
+#include "Justin/Weapon/CHandgun.h"
 
 // Sets default values
 AMyCharacter::AMyCharacter()
@@ -34,6 +35,11 @@ AMyCharacter::AMyCharacter()
 
 	//invencomp
 	invenComp = CreateDefaultSubobject<UInventoryComponent>(TEXT("PlayerInventory"));
+
+	GunComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Gun"));
+	GunComponent->SetupAttachment(GetMesh(), FName(TEXT("GunPosition")));
+	GunComponent->SetRelativeLocation(FVector(-7.144f, 3.68f, 4.136f));
+	GunComponent->SetRelativeRotation(FRotator(3.4f, 75.699f, 6.6424f));
 }
 
 // Called when the game starts or when spawned
@@ -47,6 +53,7 @@ void AMyCharacter::BeginPlay()
 	UEnhancedInputLocalPlayerSubsystem* subSystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(playerContoller->GetLocalPlayer());
 	subSystem->AddMappingContext(imc_Default, 0);
 
+	hasPistol = false;
 }
 
 // Called every frame
@@ -69,6 +76,8 @@ void AMyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 		enhancedInputComponent->BindAction(ia_Look, ETriggerEvent::Triggered, this, &AMyCharacter::EnhancedLook);
 		enhancedInputComponent->BindAction(ia_GetDrop, ETriggerEvent::Started, this, &AMyCharacter::EnhancedDrop);
 		enhancedInputComponent->BindAction(ia_InputItemSlot, ETriggerEvent::Started, this, &AMyCharacter::SelectItem);
+		enhancedInputComponent->BindAction(ia_Fire, ETriggerEvent::Started, this, &AMyCharacter::EnhancedFire);
+		enhancedInputComponent->BindAction(ia_Reload, ETriggerEvent::Started, this, &AMyCharacter::EnhancedReload);
 	}
 }
 
@@ -98,11 +107,9 @@ void AMyCharacter::EnhancedLook(const struct FInputActionValue& value)
 void AMyCharacter::EnhancedDrop(const struct FInputActionValue& value)
 {
 	
-	UE_LOG(LogTemp, Warning, TEXT("f"));
-	//GetWorld()->SpawnActor<ACInteractableItem>(invenComp->myItems[], GetActorLocation(), GetActorRotation());
-	//가지고 있는 아이템의 정보를 none 으로 바꿔치기해보자
-	//invenComp->myItems.e
-	//DropItem();
+	UE_LOG(LogTemp, Warning, TEXT("Drop Item"));
+	
+	DetachGun();
 }
 
 void AMyCharacter::SelectItem(const struct FInputActionValue& value)
@@ -119,9 +126,19 @@ void AMyCharacter::SelectItem(const struct FInputActionValue& value)
 	
 	UE_LOG(LogTemp, Warning, TEXT("item : %d"), HaveItemSlot);
 	
-	
 	//선택한 아이템의 기능을 사용할 수 있는 함수를 호출
+	AttachGun();
+}
 
+void AMyCharacter::EnhancedFire(const struct FInputActionValue& value)
+{
+	//if (hasPistol && invenComp->myItems[1].InventorySlotType == EInventorySlotType::INV_MAX) return;
+	PlayerFIre();
+}
+
+void AMyCharacter::EnhancedReload(const struct FInputActionValue& value)
+{
+	PlayerReload();
 }
 
 // old version
@@ -166,17 +183,60 @@ bool AMyCharacter::GetItem(FItemType itemInfo)
 	return true;
 }
 
-void AMyCharacter::DropItem(FItemType itemInfo)
+
+void AMyCharacter::AttachGun()
 {
-	int32 WantDropItem = (int32)(itemInfo.InventorySlotType);
+	// 2번 권총 슬롯이 비어있으면 리턴
+	if(invenComp->myItems[1].InventorySlotType == EInventorySlotType::INV_MAX) return;
+	
+	//핸드건 가지고 있지 않으면
+	if (!hasPistol) // true면 내려가 
+	{
+		// 핸드건 스폰
+		handGun = GetWorld()->SpawnActor<ACHandgun>(invenComp->myItems[1].GameplayItemClass, GetActorLocation(), GetActorRotation());
+		if(handGun != nullptr)
+		// 핸드건을 건 컴포넌트에 붙이기
+		handGun->AttachToComponent(GunComponent, FAttachmentTransformRules::SnapToTargetIncludingScale);
 
-	//슬롯 비어있으면 리턴
-	if (invenComp->myItems[WantDropItem].InventorySlotType != EInventorySlotType::INV_MAX) return;
+		//핸드건 가지고있다
+		hasPistol = true;
+	}
 
-	//invenComp->myItems
+}
 
-	//UE_LOG(LogTemp, Warning, TEXT(""));
-	//SelectItem(WantDropItem);
-	//invenComp->myItems[]
+// 총 떨구기와 떨군 총 스폰
+void AMyCharacter::DetachGun()
+{
+	if (invenComp->myItems[1].InventorySlotType == EInventorySlotType::INV_MAX) return;
+
+	// 총 가지고 있으면
+	if (hasPistol)
+	{
+		//총 손에서 제거
+		handGun->DetachFromActor(FDetachmentTransformRules::KeepRelativeTransform);
+		//필드에 총 스폰
+		GetWorld()->SpawnActor<ACInteractableItem>(invenComp->myItems[1].DroppedItemClass, GetActorLocation(), GetActorRotation());
+		//비어있는 슬롯으로 바꿔치기
+		invenComp->myItems[1] = invenComp->myItems[0];
+
+		//총 안가지고있다
+		hasPistol = false;
+	}
+}
+
+void AMyCharacter::PlayerFIre()
+{
+	//if(handGun == nullptr) return;
+	//hasPistol이 true 면 내려가고 false 리턴
+	if(!hasPistol) return; 
+	
+	handGun->Fire();
+}
+
+void AMyCharacter::PlayerReload()
+{
+	//if (hasPistol && invenComp->myItems[1].InventorySlotType == EInventorySlotType::INV_MAX) return;
+	if(!hasPistol) return; 
+	handGun->Reload();
 }
 

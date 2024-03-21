@@ -45,27 +45,54 @@ public:
 	class UInputAction* ia_GetDrop;
 	UPROPERTY(EditAnywhere)
 	class UInputAction* ia_InputItemSlot;
+	UPROPERTY(EditAnywhere)
+	class UInputAction* ia_Fire;
+	UPROPERTY(EditAnywhere)
+	class UInputAction* ia_Reload;
 
+
+public:
+	UPROPERTY()
+	class UPlayerAnimInstance* anim;
+
+public:
 	UPROPERTY(EditAnywhere)
 	class UInventoryComponent* invenComp;
 
 	UPROPERTY(EditAnywhere)
-	TSubclassOf<class ACInteractableItem> itemFactory;
+	class USceneComponent* GunComponent;
+
 	
-	
+	UPROPERTY(EditAnywhere)
+	class ACHandgun* handGun;
+
+	UPROPERTY(EditAnywhere)
+	AActor* hand;
 
 	//camera
 	UPROPERTY(EditAnywhere)
 	class UCameraComponent* camera;
+public:
+	bool hasPistol = false;
+
 public:
 	void EnhancedMove(const struct FInputActionValue& value);
 	void EnhancedJump(const struct FInputActionValue& value);
 	void EnhancedLook(const struct FInputActionValue& value);
 	void EnhancedDrop(const struct FInputActionValue& value);
 	void SelectItem(const struct FInputActionValue& value);
+	void EnhancedFire(const struct FInputActionValue& value);
+	void EnhancedReload(const struct FInputActionValue& value);
+
+
 
 	void GetItem(EInventorySlotType slotType);
 	bool GetItem(struct FItemType itemInfo);
 
-	void DropItem(struct FItemType itemInfo);
+	void AttachGun();
+	void DetachGun();
+
+	void PlayerFIre();
+	void PlayerReload();
+
 };

@@ -58,22 +58,15 @@ void ACInteractableItem::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent
 	//플레이어랑 충돌 났으면 => 나중에 인벤토리에 아이템이 들어가 있는지 없는지 판단
 	if (player)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("choong"));
-		// 사라져라
-		
+		UE_LOG(LogTemp, Warning, TEXT("Get Item"));
 		//인벤에 이 아이템 정보 넣어라
-		//player->GetItem((EInventorySlotType) EInventorySlotType::INV_PRIMARY);
 		bool isGetItem = player->GetItem(ItemInfo);
-		//inven->myItems.Add(gameInstance->defineItem[]);
-		// 포문으로 돌려 / 아이템 인포랑 같은지, ItemNameTag로 (FGameplayTag)
-		// 같으면 그 인덱스를 저장
-		// break 해라 
-		if(isGetItem)	Destroy();
+		if(isGetItem)Destroy();
 
 	}
 	else
 	{
-		UE_LOG(LogTemp, Warning, TEXT("xxxxx"));
+		//UE_LOG(LogTemp, Warning, TEXT("NO Get Item"));
 	}
 }
 
