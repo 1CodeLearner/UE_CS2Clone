@@ -3,6 +3,9 @@
 
 #include "Justin/Framework/MyPlayerController.h"
 #include "Justin/UI/GameplayDisplay.h"
+#include "RealGameMode.h"
+#include "Justin/Framework/MyPlayerState.h"
+#include "GameFramework/Character.h"
 
 AMyPlayerController::AMyPlayerController()
 {
@@ -28,7 +31,7 @@ void AMyPlayerController::DisplayGameplay()
 void AMyPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
-	if (IsLocalController()) 
+	if (IsLocalController())
 	{
 		DisplayGameplay();
 	}
@@ -36,6 +39,7 @@ void AMyPlayerController::BeginPlay()
 	{
 		SendServerTimeRequest();
 		FTimerHandle Handle;
+		//every 5 seconds send server time request to sync with server time
 		GetWorld()->GetTimerManager().SetTimer(Handle, this, &AMyPlayerController::SendServerTimeRequest, 5.f, true);
 	}
 }
@@ -46,11 +50,18 @@ void AMyPlayerController::Tick(float DeltaSeconds)
 
 	if (bStart && GameplayDisplay)
 	{
-		float remainingTime = DestTime - (MarkedTime + DeltaSeconds);		
+		float remainingTime = DestTime - (MarkedTime + DeltaSeconds);
 		if (remainingTime <= 0.f)
 		{
 			bStart = false;
 			GameplayDisplay->SetTime(0.f);
+
+			if (HasAuthority())
+			{
+				UE_LOG(LogTemp, Warning, TEXT("Timer ended"));
+				auto GM = GetWorld()->GetAuthGameMode<ARealGameMode>();
+				GM->StartMatch();
+			}
 		}
 		else {
 			GameplayDisplay->SetTime(remainingTime);
@@ -90,7 +101,7 @@ void AMyPlayerController::Client_RespondServerTime_Implementation(float SentClie
 {
 	float RoundTripTime = GetWorld()->GetTimeSeconds() - SentClientTime;
 	float EstimatedServerTime = CurrentServerTime + RoundTripTime / 2.f;
-	
+
 	DeltaTime = EstimatedServerTime - GetWorld()->GetTimeSeconds();
 }
 
@@ -98,5 +109,13 @@ void AMyPlayerController::OnPossess(APawn* aPawn)
 {
 	Super::OnPossess(aPawn);
 	UE_LOG(LogTemp, Warning, TEXT("OnPossess, Net: %s"), GetWorld()->GetNetMode() == NM_Client ? TEXT("Client") : TEXT("Server"));
-
+	auto PS = Cast<AMyPlayerState>(PlayerState);
+	if (ensure(PS))
+	{
+		PS->SetCharacter(Cast<ACharacter>(aPawn));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("No PlayerState?"));
+	}
 }

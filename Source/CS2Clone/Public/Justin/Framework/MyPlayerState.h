@@ -26,13 +26,10 @@ class CS2CLONE_API AMyPlayerState : public APlayerState
 
 public:
 	AMyPlayerState();
-
+	void SetCharacter(ACharacter* Controlled); 
 protected:
 	virtual void BeginPlay() override;
 	virtual void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const override;
-
-
-
 
 protected:
 	UPROPERTY(ReplicatedUsing = OnRep_Try)
