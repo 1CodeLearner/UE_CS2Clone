@@ -50,10 +50,19 @@ public:
 	UPROPERTY(EditAnywhere)
 	class UInputAction* ia_Reload;
 
+public:
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class UMyUserWidget> MyUserWidgetFactory;
+
+	UPROPERTY()
+	class UMyUserWidget* MyUserWidget;
 
 public:
 	UPROPERTY()
 	class UPlayerAnimInstance* anim;
+
+	UPROPERTY(EditAnywhere)
+	class UAnimMontage* pistolMontage;
 
 public:
 	UPROPERTY(EditAnywhere)

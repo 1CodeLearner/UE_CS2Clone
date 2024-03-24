@@ -9,6 +9,8 @@
 #include "Justin/Base/CInteractableItem.h"
 #include "CSGameInstance.h"
 #include "Justin/Weapon/CHandgun.h"
+#include "PlayerAnimInstance.h"
+#include "MyUserWidget.h"
 
 // Sets default values
 AMyCharacter::AMyCharacter()
@@ -52,8 +54,12 @@ void AMyCharacter::BeginPlay()
 	//get subSystem
 	UEnhancedInputLocalPlayerSubsystem* subSystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(playerContoller->GetLocalPlayer());
 	subSystem->AddMappingContext(imc_Default, 0);
-
+	anim = Cast<UPlayerAnimInstance>(GetMesh()->GetAnimInstance());
+	
 	hasPistol = false;
+	MyUserWidget = Cast<UMyUserWidget>(CreateWidget(GetWorld(), MyUserWidgetFactory));
+	MyUserWidget->AddToViewport();
+
 }
 
 // Called every frame
@@ -200,6 +206,8 @@ void AMyCharacter::AttachGun()
 
 		//핸드건 가지고있다
 		hasPistol = true;
+
+		anim->hasPistol = true;
 	}
 
 }
@@ -221,6 +229,7 @@ void AMyCharacter::DetachGun()
 
 		//총 안가지고있다
 		hasPistol = false;
+		anim->hasPistol = false;
 	}
 }
 
@@ -230,6 +239,7 @@ void AMyCharacter::PlayerFIre()
 	//hasPistol이 true 면 내려가고 false 리턴
 	if(!hasPistol) return; 
 	
+	PlayAnimMontage(pistolMontage, 1.0f, FName(TEXT("Fire")));
 	handGun->Fire();
 }
 
@@ -237,6 +247,8 @@ void AMyCharacter::PlayerReload()
 {
 	//if (hasPistol && invenComp->myItems[1].InventorySlotType == EInventorySlotType::INV_MAX) return;
 	if(!hasPistol) return; 
+	
+	PlayAnimMontage(pistolMontage, 1.0f, FName(TEXT("Reload")));
 	handGun->Reload();
 }
 
