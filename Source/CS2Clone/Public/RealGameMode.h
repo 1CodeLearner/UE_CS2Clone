@@ -7,12 +7,17 @@
 #include "RealGameMode.generated.h"
 
 /**
- * 
+ *
  */
 UCLASS()
 class CS2CLONE_API ARealGameMode : public AGameMode
 {
 	GENERATED_BODY()
-public: 
+public:
 	ARealGameMode();
+
+protected:
+	virtual void PostLogin(APlayerController* NewPlayer) override;
+
+	virtual void HandleMatchHasStarted() override;
 };
