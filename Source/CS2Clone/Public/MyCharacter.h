@@ -94,16 +94,34 @@ public:
 	void EnhancedFire(const struct FInputActionValue& value);
 	void EnhancedReload(const struct FInputActionValue& value);
 
-
 	void MappingContext();
 
 	void GetItem(EInventorySlotType slotType);
 	bool GetItem(struct FItemType itemInfo);
 
 	void AttachGun();
+	UFUNCTION(Server, Reliable)
+	void ServerAttachGun();
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiAttachGun();
+
 	void DetachGun();
+	UFUNCTION(Server, Reliable)
+	void ServerDetachGun();
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiDetachGun();
+
 
 	void PlayerFIre();
+	UFUNCTION(Server, Reliable)
+	void ServerPlayerFire();
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiPlayerFire();
+
 	void PlayerReload();
+	UFUNCTION(Server, Reliable)
+	void ServerReload();
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiReload();
 
 };
