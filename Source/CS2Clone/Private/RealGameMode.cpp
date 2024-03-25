@@ -10,7 +10,7 @@
 
 ARealGameMode::ARealGameMode()
 {
-	bDelayedStart = false;
+	bDelayedStart = true;
 }
 
 void ARealGameMode::PostLogin(APlayerController* NewPlayer)
