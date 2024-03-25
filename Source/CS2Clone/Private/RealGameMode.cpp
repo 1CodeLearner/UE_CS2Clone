@@ -47,8 +47,8 @@ void ARealGameMode::Tick(float DeltaSeconds)
 void ARealGameMode::PostLogin(APlayerController* NewPlayer)
 {
 	Super::PostLogin(NewPlayer);
-
-
+	//When new player joins, reset countdown to game start.
+	StartTimer();
 }
 
 void ARealGameMode::InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage)
@@ -60,17 +60,11 @@ void ARealGameMode::InitGame(const FString& MapName, const FString& Options, FSt
 	* if game did not start - mark game as started.
 	* if game did start - skip delay start and start game immediately
 	*/
-	//GameInstance = GetGameInstance<UCSGameInstance>();
-	//if (GameInstance)
-	//{
-	//	
-	//	if (!GameInstance->GetGameStarted())
-	//	{
-	//		UE_LOG(LogTemp, Warning, TEXT("Test"));
-	//		bDelayedStart = true;
-	//		GameInstance->SetGameStarted(true);
-	//	}
-	//}
+	GameInstance = GetGameInstance<UCSGameInstance>();
+	if (GameInstance && !GameInstance->GetGameStarted())
+	{
+		GameInstance->SetGameStarted(true);
+	}
 }
 
 void ARealGameMode::HandleMatchIsWaitingToStart()

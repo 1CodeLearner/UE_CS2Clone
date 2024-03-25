@@ -30,8 +30,8 @@ protected:
 	UFUNCTION()
 	void RestartTest();
 private:
-	/*UPROPERTY()
-	TObjectPtr<UCSGameInstance> GameInstance;*/
+	UPROPERTY()
+	TObjectPtr<UCSGameInstance> GameInstance;
 	void AssignTeam();
 
 	//카운트다운 정보 처리
