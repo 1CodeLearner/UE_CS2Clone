@@ -94,6 +94,7 @@ public:
 	void EnhancedReload(const struct FInputActionValue& value);
 
 
+	void MappingContext();
 
 	void GetItem(EInventorySlotType slotType);
 	bool GetItem(struct FItemType itemInfo);
