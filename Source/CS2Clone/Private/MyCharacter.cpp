@@ -15,7 +15,7 @@
 // Sets default values
 AMyCharacter::AMyCharacter()
 {
- 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	//skeleta mesh 셋팅
@@ -24,7 +24,7 @@ AMyCharacter::AMyCharacter()
 	{
 		GetMesh()->SetSkeletalMesh(tempMesh.Object);
 	}
-	
+
 	// 메쉬 위치 셋팅
 	GetMesh()->SetRelativeLocation(FVector(0, 0, -88));
 	GetMesh()->SetRelativeRotation(FRotator(0, -90, 0));
@@ -48,20 +48,20 @@ AMyCharacter::AMyCharacter()
 void AMyCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 	////get APlayerController
 	//APlayerController* playerContoller = Cast<APlayerController>(Controller);
 	////get subSystem
 	//UEnhancedInputLocalPlayerSubsystem* subSystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(playerContoller-//>GetLocalPlayer());
 	//subSystem->AddMappingContext(imc_Default, 0);
 	anim = Cast<UPlayerAnimInstance>(GetMesh()->GetAnimInstance());
-	
+
 	hasPistol = false;
 	MyUserWidget = Cast<UMyUserWidget>(CreateWidget(GetWorld(), MyUserWidgetFactory));
 	MyUserWidget->AddToViewport();
 
-		
-	if(IsLocallyControlled())
+
+	if (IsLocallyControlled())
 	{
 		MappingContext();
 	}
@@ -81,7 +81,7 @@ void AMyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 	UEnhancedInputComponent* enhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent);
-	if(enhancedInputComponent != nullptr)
+	if (enhancedInputComponent != nullptr)
 	{
 		enhancedInputComponent->BindAction(ia_Move, ETriggerEvent::Triggered, this, &AMyCharacter::EnhancedMove);
 		enhancedInputComponent->BindAction(ia_Jump, ETriggerEvent::Triggered, this, &AMyCharacter::EnhancedJump);
@@ -93,8 +93,15 @@ void AMyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	}
 }
 
+void AMyCharacter::PossessedBy(AController* NewController)
+{
+	Super::PossessedBy(NewController);
+
+	MappingContext();
+}
+
 void AMyCharacter::EnhancedMove(const struct FInputActionValue& value)
-{	
+{
 	FVector2D dir = value.Get<FVector2D>();
 	FVector originVec = FVector(dir.Y, dir.X, 0);
 	FVector newVec = GetTransform().TransformVector(originVec);
@@ -118,9 +125,9 @@ void AMyCharacter::EnhancedLook(const struct FInputActionValue& value)
 
 void AMyCharacter::EnhancedDrop(const struct FInputActionValue& value)
 {
-	
+
 	UE_LOG(LogTemp, Warning, TEXT("Drop Item"));
-	
+
 	DetachGun();
 }
 
@@ -134,10 +141,10 @@ void AMyCharacter::SelectItem(const struct FInputActionValue& value)
 	EInventorySlotType HaveItemSlot = invenComp->myItems[slotIdx].InventorySlotType;
 
 	// 내 아이템 슬롯에 아이템이 없으면 리턴
-	if(HaveItemSlot == EInventorySlotType::INV_MAX) return;
-	
+	if (HaveItemSlot == EInventorySlotType::INV_MAX) return;
+
 	UE_LOG(LogTemp, Warning, TEXT("item : %d"), HaveItemSlot);
-	
+
 	//선택한 아이템의 기능을 사용할 수 있는 함수를 호출
 	AttachGun();
 }
@@ -186,12 +193,12 @@ void AMyCharacter::GetItem(EInventorySlotType slotType)
 	// 열거형을 인트형으로 형변환
 	int32 invenSlotType = (int32)slotType;
 
-	
+
 	// 1. 아이템 슬롯 중복 되면 안되고 인벤 배열이 5이상 되면 들어오지않도록
-	
+
 	// 게임 인스턴스 가져오기
 	UCSGameInstance* gameInstance = Cast<UCSGameInstance>(GetWorld()->GetGameInstance());
-	
+
 	//invenComp->myItems.Add(gameInstance->defineItem[invenSlotType]);
 	invenComp->myItems[invenSlotType] = gameInstance->defineItem[invenSlotType];
 	// 가지고있는것중에 0보다 크면 return //or nullptr; 
@@ -213,10 +220,10 @@ bool AMyCharacter::GetItem(FItemType itemInfo)
 
 	//만약 인벤에 있는 아이템 배열에서 아이템 타입이 max가 아니면 false 리턴 
 	//같은 슬롯타입에 아이템을 갖고있으면 안됨 
-	if(invenComp->myItems[invenSlotType].InventorySlotType != EInventorySlotType::INV_MAX) return false;
+	if (invenComp->myItems[invenSlotType].InventorySlotType != EInventorySlotType::INV_MAX) return false;
 
 	//내 인벤 슬롯 타입에 충돌체 아이템정보 추가
-	invenComp->myItems[invenSlotType] = itemInfo; 
+	invenComp->myItems[invenSlotType] = itemInfo;
 	return true;
 }
 
@@ -224,16 +231,16 @@ bool AMyCharacter::GetItem(FItemType itemInfo)
 void AMyCharacter::AttachGun()
 {
 	// 2번 권총 슬롯이 비어있으면 리턴
-	if(invenComp->myItems[1].InventorySlotType == EInventorySlotType::INV_MAX) return;
-	
+	if (invenComp->myItems[1].InventorySlotType == EInventorySlotType::INV_MAX) return;
+
 	//핸드건 가지고 있지 않으면
 	if (!hasPistol) // true면 내려가 
 	{
 		// 핸드건 스폰
 		handGun = GetWorld()->SpawnActor<ACHandgun>(invenComp->myItems[1].GameplayItemClass, GetActorLocation(), GetActorRotation());
-		if(handGun != nullptr)
-		// 핸드건을 건 컴포넌트에 붙이기
-		handGun->AttachToComponent(GunComponent, FAttachmentTransformRules::SnapToTargetIncludingScale);
+		if (handGun != nullptr)
+			// 핸드건을 건 컴포넌트에 붙이기
+			handGun->AttachToComponent(GunComponent, FAttachmentTransformRules::SnapToTargetIncludingScale);
 
 		//핸드건 가지고있다
 		hasPistol = true;
@@ -268,8 +275,8 @@ void AMyCharacter::PlayerFIre()
 {
 	//if(handGun == nullptr) return;
 	//hasPistol이 true 면 내려가고 false 리턴
-	if(!hasPistol) return; 
-	
+	if (!hasPistol) return;
+
 	PlayAnimMontage(pistolMontage, 1.0f, FName(TEXT("Fire")));
 	handGun->Fire();
 }
@@ -277,8 +284,8 @@ void AMyCharacter::PlayerFIre()
 void AMyCharacter::PlayerReload()
 {
 	//if (hasPistol && invenComp->myItems[1].InventorySlotType == EInventorySlotType::INV_MAX) return;
-	if(!hasPistol) return; 
-	
+	if (!hasPistol) return;
+
 	PlayAnimMontage(pistolMontage, 1.0f, FName(TEXT("Reload")));
 	handGun->Reload();
 }
