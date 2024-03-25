@@ -24,8 +24,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<struct FItemType> defineItem;
 
-	void SetGameStarted(bool bStarted);
-	bool GetGameStarted() const;
+	/*void SetGameStarted(bool bStarted);
+	bool GetGameStarted() const;*/
 private:
-	bool bGameStarted;
+	/*bool bGameStarted;*/
 };

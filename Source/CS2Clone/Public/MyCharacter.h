@@ -9,6 +9,13 @@
 //인벤토리 슬롯 타입 전방선언
 enum class EInventorySlotType : uint8;
 
+USTRUCT()
+struct FPlayerInfo 
+{
+	GENERATED_BODY()
+
+};
+
 UCLASS()
 class CS2CLONE_API AMyCharacter : public ACharacter
 {
