@@ -49,16 +49,22 @@ void AMyCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	//get APlayerController
-	APlayerController* playerContoller = Cast<APlayerController>(GetController());
-	//get subSystem
-	UEnhancedInputLocalPlayerSubsystem* subSystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(playerContoller->GetLocalPlayer());
-	subSystem->AddMappingContext(imc_Default, 0);
+	////get APlayerController
+	//APlayerController* playerContoller = Cast<APlayerController>(Controller);
+	////get subSystem
+	//UEnhancedInputLocalPlayerSubsystem* subSystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(playerContoller-//>GetLocalPlayer());
+	//subSystem->AddMappingContext(imc_Default, 0);
 	anim = Cast<UPlayerAnimInstance>(GetMesh()->GetAnimInstance());
 	
 	hasPistol = false;
 	MyUserWidget = Cast<UMyUserWidget>(CreateWidget(GetWorld(), MyUserWidgetFactory));
 	MyUserWidget->AddToViewport();
+
+		
+	if(IsLocallyControlled())
+	{
+		MappingContext();
+	}
 
 }
 
@@ -145,6 +151,31 @@ void AMyCharacter::EnhancedFire(const struct FInputActionValue& value)
 void AMyCharacter::EnhancedReload(const struct FInputActionValue& value)
 {
 	PlayerReload();
+}
+
+void AMyCharacter::MappingContext()
+{
+	//get APlayerController
+	APlayerController* playerContoller = Cast<APlayerController>(GetController());
+	//get subSystem
+	UEnhancedInputLocalPlayerSubsystem* subSystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(playerContoller->GetLocalPlayer());
+	if (HasAuthority())
+	{
+		const FString Test = GetWorld()->IsNetMode(NM_Client) ? TEXT("Client") : TEXT("Server");
+		GEngine->AddOnScreenDebugMessage(-1, 12.f, FColor::Red, FString::Printf(TEXT("HasAuthority. subSystem:%s. Net:%s"),
+			subSystem ? TEXT("YES") : TEXT("NO"), *Test));
+	}
+	else
+	{
+		const FString Test = GetWorld()->IsNetMode(NM_Client) ? TEXT("Client") : TEXT("Server");
+		GEngine->AddOnScreenDebugMessage(-1, 12.f, FColor::Red, FString::Printf(TEXT("NoAuthority. subSystem:%s. Net:%s"),
+			subSystem ? TEXT("YES") : TEXT("NO"), *Test));
+	}
+	if (subSystem)
+	{
+		subSystem->AddMappingContext(imc_Default, 0);
+	}
+
 }
 
 // old version
