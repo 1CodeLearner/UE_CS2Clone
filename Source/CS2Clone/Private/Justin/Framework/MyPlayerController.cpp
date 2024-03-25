@@ -14,6 +14,7 @@ AMyPlayerController::AMyPlayerController()
 	DeltaTime = 0.f;
 	DestTime = 10.f;
 	MarkedTime = 0.f;
+	bStart = false;
 }
 
 void AMyPlayerController::DisplayGameplay()
@@ -31,10 +32,10 @@ void AMyPlayerController::DisplayGameplay()
 void AMyPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
-	if (IsLocalController())
-	{
-		DisplayGameplay();
-	}
+	//if (IsLocalController())
+	//{
+	//	DisplayGameplay();
+	//}
 	if (!HasAuthority())
 	{
 		SendServerTimeRequest();
@@ -48,13 +49,13 @@ void AMyPlayerController::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
-	if (bStart && GameplayDisplay)
+	if (bStart) //&& GameplayDisplay)
 	{
 		float remainingTime = DestTime - (MarkedTime + DeltaSeconds);
 		if (remainingTime <= 0.f)
 		{
 			bStart = false;
-			GameplayDisplay->SetTime(0.f);
+			//GameplayDisplay->SetTime(0.f);
 
 			if (HasAuthority())
 			{
@@ -64,7 +65,7 @@ void AMyPlayerController::Tick(float DeltaSeconds)
 			}
 		}
 		else {
-			GameplayDisplay->SetTime(remainingTime);
+			//GameplayDisplay->SetTime(remainingTime);
 			MarkedTime += DeltaSeconds;
 		}
 	}
@@ -93,7 +94,6 @@ float AMyPlayerController::GetServerTime() const
 
 void AMyPlayerController::Server_RequestServerTime_Implementation(float SentClientTime)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Nice"));
 	Client_RespondServerTime(SentClientTime, GetWorld()->GetTimeSeconds());
 }
 
@@ -103,6 +103,7 @@ void AMyPlayerController::Client_RespondServerTime_Implementation(float SentClie
 	float EstimatedServerTime = CurrentServerTime + RoundTripTime / 2.f;
 
 	DeltaTime = EstimatedServerTime - GetWorld()->GetTimeSeconds();
+	UE_LOG(LogTemp, Warning, TEXT("Current Server time: %f"), GetServerTime());
 }
 
 void AMyPlayerController::OnPossess(APawn* aPawn)

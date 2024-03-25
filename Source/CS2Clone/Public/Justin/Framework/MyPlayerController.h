@@ -30,10 +30,7 @@ protected:
 	TSubclassOf<UGameplayDisplay> GameplayDisplayClass;
 	UPROPERTY()
 	TObjectPtr<UGameplayDisplay> GameplayDisplay;
-
-
-
-		virtual void OnPossess(APawn* aPawn) override;
+	virtual void OnPossess(APawn* aPawn) override;
 
 private:
 	//서버 시간 동기화
