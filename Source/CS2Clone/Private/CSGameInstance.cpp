@@ -31,6 +31,14 @@ UCSGameInstance::UCSGameInstance()
 void UCSGameInstance::Init()
 {
 	Super::Init();
+}
 
+void UCSGameInstance::SetGameStarted(bool bStarted)
+{
+	bGameStarted = bStarted;
+}
 
+bool UCSGameInstance::GetGameStarted() const
+{
+	return bGameStarted;
 }

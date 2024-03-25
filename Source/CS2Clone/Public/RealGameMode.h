@@ -22,4 +22,8 @@ protected:
 	virtual void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage) override;
 
 	virtual void HandleMatchHasStarted() override;
+	virtual void HandleLeavingMap() override;
+
+	UFUNCTION()
+	void RestartTest();
 };

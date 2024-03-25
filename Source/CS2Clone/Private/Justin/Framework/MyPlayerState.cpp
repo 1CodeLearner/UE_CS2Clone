@@ -14,12 +14,15 @@ AMyPlayerState::AMyPlayerState()
 void AMyPlayerState::BeginPlay()
 {
 	Super::BeginPlay();
-	UE_LOG(LogTemp, Warning, TEXT("Net: %s,PlayerState Beginplay"), GetWorld()->GetNetMode() == NM_Client ? TEXT("Client") : TEXT("Server"));
+	//UE_LOG(LogTemp, Warning, TEXT("Net: %s,PlayerState Beginplay"), GetWorld()->GetNetMode() == NM_Client ? TEXT("Client") : TEXT("Server"));
+
+	//UE_LOG(LogTemp, Warning, TEXT("PlayerID: %s"), PlayerId);
+	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("PlayerID: %s"), ));
 }
 
 void AMyPlayerState::OnRep_Try()
 {
-	UE_LOG(LogTemp, Warning, TEXT("OnRep_Try"));
+	//UE_LOG(LogTemp, Warning, TEXT("OnRep_Try"));
 	TestCharacter = TestCharacter ? TestCharacter : Cast<ACharacter>(GetPawn());
 	SetTeamMesh();
 }

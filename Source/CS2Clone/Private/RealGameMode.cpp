@@ -7,10 +7,11 @@
 #include "kismet/GameplayStatics.h"
 #include "Justin/Framework/MyPlayerState.h"
 #include "Justin/Framework/MyGameState.h"
+#include "CSGameInstance.h"
 
 ARealGameMode::ARealGameMode()
 {
-	bDelayedStart = true;
+	bDelayedStart = false;
 }
 
 void ARealGameMode::PostLogin(APlayerController* NewPlayer)
@@ -22,6 +23,17 @@ void ARealGameMode::InitGame(const FString& MapName, const FString& Options, FSt
 {
 	Super::InitGame(MapName, Options, ErrorMessage);
 	UE_LOG(LogTemp, Warning, TEXT("InitGame"));
+	auto GI = GetGameInstance<UCSGameInstance>();
+	if (GI)
+	{
+		//if game did not start - mark game as started and skip on the next round.
+		if (!GI->GetGameStarted())
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Test"));
+			bDelayedStart = true;
+			GI->SetGameStarted(true);
+		}
+	}
 }
 
 void ARealGameMode::HandleMatchHasStarted()
@@ -36,7 +48,7 @@ void ARealGameMode::HandleMatchHasStarted()
 		for (int i = 0; i < GS->PlayerArray.Num(); ++i)
 		{
 			auto PS = Cast<AMyPlayerState>(GS->PlayerArray[i]);
-			if ( ensure(PS) && ensureAlways(PS->TeamType == ETeam::TEAM_MAX))
+			if (ensure(PS) && ensureAlways(PS->TeamType == ETeam::TEAM_MAX))
 			{
 				if (GS->Team_CounterTerrorist.Num() < GS->Team_Terrorist.Num())
 				{
@@ -47,10 +59,25 @@ void ARealGameMode::HandleMatchHasStarted()
 				else
 				{
 					PS->TeamType = ETeam::TEAM_T;
-					PS->SetTeamMesh();					
+					PS->SetTeamMesh();
 					GS->Team_Terrorist.Add(PS);
 				}
 			}
 		}
 	}
+
+	FTimerHandle Handle;
+	GetWorld()->GetTimerManager().SetTimer(Handle, this, &ARealGameMode::RestartTest, 5.f, false);
+}
+
+void ARealGameMode::HandleLeavingMap()
+{
+	Super::HandleLeavingMap();
+
+	UE_LOG(LogTemp, Warning, TEXT("Leaving map....`"));
+}
+
+void ARealGameMode::RestartTest()
+{
+	RestartGame();
 }
