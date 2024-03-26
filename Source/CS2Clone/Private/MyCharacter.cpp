@@ -65,7 +65,8 @@ void AMyCharacter::BeginPlay()
 	{
 		MappingContext();
 	}
-
+	
+	CurrHp = MaxHP;
 }
 
 // Called every frame
@@ -182,31 +183,6 @@ void AMyCharacter::MappingContext()
 
 }
 
-// old version
-void AMyCharacter::GetItem(EInventorySlotType slotType)
-{
-	//FName slotName = UEnum::GetValueAsName<EInventorySlotType>(slotType);
-	//UE_LOG(LogTemp, Warning, TEXT("slotName : %s"), *slotName.ToString());
-	// 열거형을 인트형으로 형변환
-	int32 invenSlotType = (int32)slotType;
-
-
-	// 1. 아이템 슬롯 중복 되면 안되고 인벤 배열이 5이상 되면 들어오지않도록
-
-	// 게임 인스턴스 가져오기
-	UCSGameInstance* gameInstance = Cast<UCSGameInstance>(GetWorld()->GetGameInstance());
-
-	//invenComp->myItems.Add(gameInstance->defineItem[invenSlotType]);
-	invenComp->myItems[invenSlotType] = gameInstance->defineItem[invenSlotType];
-	// 가지고있는것중에 0보다 크면 return //or nullptr; 
-
-	//게임 인스턴스 가져오기
-	//UCSGameInstance* gameInstance = Cast<UCSGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
-	//인벤 컴포넌트에
-	//invenComp->myItems.Add(gameInstance->defineItem[slotType]);
-
-
-}
 
 //new version
 bool AMyCharacter::GetItem(FItemType itemInfo)
@@ -329,5 +305,10 @@ void AMyCharacter::MultiReload_Implementation()
 
 	PlayAnimMontage(pistolMontage, 1.0f, FName(TEXT("Reload")));
 	handGun->Reload();
+}
+
+void AMyCharacter::PlayerDead()
+{
+
 }
 

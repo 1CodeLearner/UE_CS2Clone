@@ -194,7 +194,7 @@ void ACHandgun::Fire()
 			UE_LOG(LogTemp, Warning, TEXT("Client?: %s"), *GetNameSafe(GetOwner()));
 		}
 		Server_Fire(character, Hit);
-		DrawDebugLine(GetWorld(), Start, End, FColor::Black, false, 2.f);
+		DrawDebugLine(GetWorld(), Start, End, FColor::Black, true);
 	}
 }
 
@@ -204,6 +204,7 @@ void ACHandgun::Server_Fire_Implementation(AActor* ActorHit, FHitResult Hit)
 	if(ActorHit)
 	{
 		//플레이어 체력 줄여라.
+		
 	}
 	InMagRemainingRounds--;
 
