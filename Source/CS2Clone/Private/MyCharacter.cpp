@@ -67,7 +67,7 @@ void AMyCharacter::BeginPlay()
 	{
 		MappingContext();
 	}
-	
+
 	CurrHp = MaxHP;
 }
 
@@ -207,7 +207,7 @@ void AMyCharacter::AttachGun()
 {
 	// 2번 권총 슬롯이 비어있으면 리턴
 	if (invenComp->myItems[1].InventorySlotType == EInventorySlotType::INV_MAX) return;
-	
+
 	ServerAttachGun();
 }
 
@@ -229,7 +229,8 @@ void AMyCharacter::MultiAttachGun_Implementation()
 
 		//핸드건 가지고있다
 		hasPistol = true;
-
+		if(HasAuthority())
+			handGun->SetOwner(this);
 		anim->hasPistol = true;
 	}
 
@@ -283,10 +284,11 @@ void AMyCharacter::MultiPlayerFire_Implementation()
 	//if(handGun == nullptr) return;
 	//hasPistol이 true 면 내려가고 false 리턴
 	if (!hasPistol) return;
-
-	PlayAnimMontage(pistolMontage, 1.0f, FName(TEXT("Fire")));
-	handGun->Fire();
-
+	if (IsLocallyControlled())
+	{
+		PlayAnimMontage(pistolMontage, 1.0f, FName(TEXT("Fire")));
+		handGun->Fire();
+	}
 }
 
 void AMyCharacter::PlayerReload()

@@ -8,6 +8,7 @@
 #include "Justin/ItemTypes.h"
 #include "Kismet/GameplayStatics.h"
 #include "MyCharacter.h"
+#include "GameFramework/PlayerState.h"
 
 ACHandgun::ACHandgun()
 {
@@ -174,37 +175,34 @@ void ACHandgun::Fire()
 		FVector End = Start + camera->GetActorForwardVector() * 50000.f;
 		FCollisionQueryParams params;
 		params.AddIgnoredActor(GetOwner() ? GetOwner() : this);
-
 		//AMyCharacter를 찾는 Line trace 
-		bool bHit = GetWorld()->LineTraceSingleByChannel(Hit, Start, End, ECC_Visibility, params);
+		bool bHit = GetWorld()->LineTraceSingleByChannel(Hit, Start, End, ECC_Pawn, params);
 		AMyCharacter* character = nullptr;
 		if (bHit)
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Black, FString::Printf(TEXT("HitActor: %s"), *GetNameSafe(Hit.GetActor())));
-			//if hit actor was player, send a server RPC
-			character = Cast<AMyCharacter>(Hit.GetActor());
+			GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Black, FString::Printf(TEXT("Actor hit: %s"), *GetNameSafe(Hit.GetActor())));
 		}
 
 		//발사 되어서 서버에 총 정보 처리하기
-		if (HasAuthority())
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Server?: %s"), *GetNameSafe(GetOwner()));
-		}
-		else {
-			UE_LOG(LogTemp, Warning, TEXT("Client?: %s"), *GetNameSafe(GetOwner()));
-		}
-		Server_Fire(character, Hit);
-		DrawDebugLine(GetWorld(), Start, End, FColor::Black, true);
+		Server_Fire(Hit);
+		DrawDebugLine(GetWorld(), Start, End, FColor::Black, false, 5.f);
 	}
+
 }
 
-void ACHandgun::Server_Fire_Implementation(AActor* ActorHit, FHitResult Hit)
+void ACHandgun::Server_Fire_Implementation(FHitResult Hit)
 {
 	//플레이어가 맞았다면:
-	if(ActorHit)
+	if (Hit.GetActor())
 	{
-		//플레이어 체력 줄여라.
-		
+		//UE_LOG(LogTemp, Warning, TEXT("Owner: %s"), *GetNameSafe(Hit.GetActor()->GetOwner()));
+		auto character = Cast<AMyCharacter>(Hit.GetActor());
+		if (character)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Player hit: %s"), *character->GetPlayerState()->GetUniqueId().ToString());
+			
+			//플레이어 체력 줄여라.
+		}
 	}
 	InMagRemainingRounds--;
 
