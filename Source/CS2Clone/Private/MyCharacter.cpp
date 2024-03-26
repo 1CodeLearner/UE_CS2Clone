@@ -11,6 +11,8 @@
 #include "Justin/Weapon/CHandgun.h"
 #include "PlayerAnimInstance.h"
 #include "MyUserWidget.h"
+#include <../../../../../../../Source/Runtime/Engine/Classes/Components/CapsuleComponent.h>
+#include <../../../../../../../Source/Runtime/Engine/Classes/GameFramework/CharacterMovementComponent.h>
 
 // Sets default values
 AMyCharacter::AMyCharacter()
@@ -261,8 +263,8 @@ void AMyCharacter::MultiDetachGun_Implementation()
 
 		//총 안가지고있다
 		hasPistol = false;
-		anim->hasPistol = false;
 	}
+		anim->hasPistol = false;
 
 }
 
@@ -309,6 +311,29 @@ void AMyCharacter::MultiReload_Implementation()
 
 void AMyCharacter::PlayerDead()
 {
+	ServerDead();
+}
+
+void AMyCharacter::ServerDead_Implementation()
+{
+	MultiDead();
+}
+
+void AMyCharacter::MultiDead_Implementation()
+{
+	CurrHp = 0;
+	if (CurrHp <= 0)
+	{
+		UE_LOG(LogTemp,Warning, TEXT("dead"));
+		anim->isDeath = true;
+		// 충돌 안되게
+		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		// Movement 컴포넌트 비활성
+		GetCharacterMovement()->DisableMovement();
+		
+		MultiDetachGun();
+	}
 
 }
 

@@ -125,6 +125,11 @@ public:
 	UFUNCTION(NetMulticast, Reliable)
 	void MultiReload();
 
+	UFUNCTION(BlueprintCallable)
 	void PlayerDead();
+	UFUNCTION(Server, Reliable)
+	void ServerDead();
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiDead();
 
 };
