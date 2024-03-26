@@ -69,7 +69,7 @@ protected:
 
 	//น฿ป็
 	UFUNCTION(Server, Reliable)
-	void Server_Fire(AActor* ActorHit, FHitResult Hit);
+	void Server_Fire(FHitResult Hit);
 	UFUNCTION(NetMulticast, Reliable)
 	void Multi_Fire();
 
