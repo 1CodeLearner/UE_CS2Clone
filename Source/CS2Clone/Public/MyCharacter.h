@@ -83,14 +83,16 @@ public:
 	UPROPERTY(EditAnywhere)
 	class ACHandgun* handGun;
 
-	UPROPERTY(EditAnywhere)
-	AActor* hand;
-
 	//camera
 	UPROPERTY(EditAnywhere)
 	class UCameraComponent* camera;
+
 public:
 	bool hasPistol = false;
+
+	float MaxHP = 100;
+	float CurrHp;
+
 
 public:
 	void EnhancedMove(const struct FInputActionValue& value);
@@ -103,7 +105,6 @@ public:
 
 	void MappingContext();
 
-	void GetItem(EInventorySlotType slotType);
 	bool GetItem(struct FItemType itemInfo);
 
 	void AttachGun();
@@ -130,5 +131,7 @@ public:
 	void ServerReload();
 	UFUNCTION(NetMulticast, Reliable)
 	void MultiReload();
+
+	void PlayerDead();
 
 };
