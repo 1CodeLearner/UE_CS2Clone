@@ -125,9 +125,6 @@ void AMyCharacter::EnhancedLook(const struct FInputActionValue& value)
 
 void AMyCharacter::EnhancedDrop(const struct FInputActionValue& value)
 {
-
-	UE_LOG(LogTemp, Warning, TEXT("Drop Item"));
-
 	DetachGun();
 }
 
@@ -232,7 +229,17 @@ void AMyCharacter::AttachGun()
 {
 	// 2번 권총 슬롯이 비어있으면 리턴
 	if (invenComp->myItems[1].InventorySlotType == EInventorySlotType::INV_MAX) return;
+	
+	ServerAttachGun();
+}
 
+void AMyCharacter::ServerAttachGun_Implementation()
+{
+	MultiAttachGun();
+}
+
+void AMyCharacter::MultiAttachGun_Implementation()
+{
 	//핸드건 가지고 있지 않으면
 	if (!hasPistol) // true면 내려가 
 	{
@@ -254,10 +261,21 @@ void AMyCharacter::AttachGun()
 void AMyCharacter::DetachGun()
 {
 	if (invenComp->myItems[1].InventorySlotType == EInventorySlotType::INV_MAX) return;
+	ServerDetachGun();
+}
 
+void AMyCharacter::ServerDetachGun_Implementation()
+{
+	MultiDetachGun();
+
+}
+
+void AMyCharacter::MultiDetachGun_Implementation()
+{
 	// 총 가지고 있으면
 	if (hasPistol)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("Drop Item"));
 		//총 손에서 제거
 		handGun->DetachFromActor(FDetachmentTransformRules::KeepRelativeTransform);
 		//필드에 총 스폰
@@ -269,9 +287,20 @@ void AMyCharacter::DetachGun()
 		hasPistol = false;
 		anim->hasPistol = false;
 	}
+
 }
 
 void AMyCharacter::PlayerFIre()
+{
+	ServerPlayerFire();
+}
+
+void AMyCharacter::ServerPlayerFire_Implementation()
+{
+	MultiPlayerFire();
+}
+
+void AMyCharacter::MultiPlayerFire_Implementation()
 {
 	//if(handGun == nullptr) return;
 	//hasPistol이 true 면 내려가고 false 리턴
@@ -279,10 +308,22 @@ void AMyCharacter::PlayerFIre()
 
 	PlayAnimMontage(pistolMontage, 1.0f, FName(TEXT("Fire")));
 	handGun->Fire();
+
 }
 
 void AMyCharacter::PlayerReload()
 {
+	ServerReload();
+}
+
+void AMyCharacter::ServerReload_Implementation()
+{
+	MultiReload();
+}
+
+void AMyCharacter::MultiReload_Implementation()
+{
+
 	//if (hasPistol && invenComp->myItems[1].InventorySlotType == EInventorySlotType::INV_MAX) return;
 	if (!hasPistol) return;
 
