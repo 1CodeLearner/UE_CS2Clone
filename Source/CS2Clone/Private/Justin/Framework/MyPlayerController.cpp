@@ -78,7 +78,6 @@ void AMyPlayerController::Client_RespondServerTime_Implementation(float SentClie
 void AMyPlayerController::OnPossess(APawn* aPawn)
 {
 	Super::OnPossess(aPawn);
-	UE_LOG(LogTemp, Warning, TEXT("OnPossess, Net: %s"), GetWorld()->GetNetMode() == NM_Client ? TEXT("Client") : TEXT("Server"));
 	auto PS = Cast<AMyPlayerState>(PlayerState);
 	if (ensure(PS))
 	{

@@ -35,6 +35,8 @@ public:
 	void Fire();
 	//
 
+	virtual void OnRep_Owner() override;
+
 	//태스팅용: 무시
 	/*float timerTotal = 5.f;
 	float currTime = 0.f;*/

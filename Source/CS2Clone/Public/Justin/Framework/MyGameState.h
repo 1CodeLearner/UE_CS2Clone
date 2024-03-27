@@ -9,7 +9,7 @@
 /**
  *
  */
- class AMyPlayerState;
+class AMyPlayerState;
 
 UCLASS()
 class CS2CLONE_API AMyGameState : public AGameState
@@ -17,7 +17,20 @@ class CS2CLONE_API AMyGameState : public AGameState
 	GENERATED_BODY()
 
 	friend class ARealGameMode;
+public:
+	void SetScore();
 protected:
-	TArray<AMyPlayerState*> Team_CounterTerrorist; 
-	TArray<AMyPlayerState*> Team_Terrorist; 
+	virtual void GetLifetimeReplicatedProps(TArray< FLifetimeProperty > &OutLifetimeProps) const override;
+protected:
+
+	UPROPERTY(ReplicatedUsing = OnRep_ScoreUpdate)
+	int32 CT_Score;
+	UPROPERTY(ReplicatedUsing = OnRep_ScoreUpdate)
+	int32 T_Score;
+
+	UFUNCTION()
+	void OnRep_ScoreUpdate();
+
+	TArray<AMyPlayerState*> Team_CounterTerrorist;
+	TArray<AMyPlayerState*> Team_Terrorist;
 };

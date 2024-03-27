@@ -18,6 +18,26 @@ ARealGameMode::ARealGameMode()
 	bStart = false;
 }
 
+void ARealGameMode::OnPlayerDead(AMyCharacter* character)
+{
+	if (character)
+	{
+		auto PS = Cast<AMyPlayerState>(character->GetPlayerState());
+		if (PS)
+		{
+			auto GS = Cast<AMyGameState>(GameState);
+			if (GS && GS->Team_CounterTerrorist.Contains(PS))
+			{
+				GS->T_Score++;
+			}
+			else
+			{
+				GS->CT_Score++;
+			}
+		}
+	}
+}
+
 void ARealGameMode::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
@@ -86,8 +106,8 @@ void ARealGameMode::HandleMatchHasStarted()
 		AssignTeam();
 	}
 
-	FTimerHandle Handle;
-	GetWorld()->GetTimerManager().SetTimer(Handle, this, &ARealGameMode::RestartTest, 5.f, false);
+	/*FTimerHandle Handle;
+	GetWorld()->GetTimerManager().SetTimer(Handle, this, &ARealGameMode::RestartTest, 5.f, false);*/
 }
 
 void ARealGameMode::HandleLeavingMap()
@@ -133,8 +153,8 @@ void ARealGameMode::AssignTeam()
 
 			//add Player info on Game instance
 			auto GI = GetWorld()->GetGameInstance<UCSGameInstance>();
-			uint32 rand = FMath::RandRange(0,10);
-			GI->playerInfoMap.Add(PlayerId, FPlayerInfo(rand,PS->TeamType));
+			uint32 rand = FMath::RandRange(0, 10);
+			GI->playerInfoMap.Add(PlayerId, FPlayerInfo(rand, PS->TeamType));
 		}
 	}
 }
@@ -157,7 +177,7 @@ void ARealGameMode::UpdateTeam()
 			ETeam team = playerMapping[PlayerId].TeamType;
 			UE_LOG(LogTemp, Warning, TEXT("Update: %d, %s"), rand, *UEnum::GetValueAsString(team));
 
-			PS->TeamType = team; 
+			PS->TeamType = team;
 			PS->SetTeamMesh();
 		}
 	}

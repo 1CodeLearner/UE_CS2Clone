@@ -9,6 +9,8 @@
 #include "Kismet/GameplayStatics.h"
 #include "MyCharacter.h"
 #include "GameFramework/PlayerState.h"
+#include "RealGameMode.h"
+#include "Justin/Framework/MyPlayerController.h"
 
 ACHandgun::ACHandgun()
 {
@@ -164,6 +166,29 @@ bool ACHandgun::CanFire() const
 void ACHandgun::Fire()
 {
 	FHitResult Hit;
+	//FVector Start;
+	//FVector End;
+	//auto owner = IsValid(GetOwner());
+	//if (owner)
+	//{
+	//	auto charac = Cast<AMyCharacter>(GetOwner());
+	//	if (charac)
+	//	{
+	//		auto PC = charac->GetController<AMyPlayerController>();
+	//		if (ensure(PC))
+	//		{
+	//			FVector CamLoc;
+	//			FRotator CamRot;
+	//			PC->GetPlayerViewPoint(CamLoc, CamRot);
+
+	//			Start = CamLoc;
+	//			End = CamLoc + 10000.f * CamRot.Vector().Normalize();
+
+
+	//		}
+	//	}
+
+	//}
 	AActor* camera = UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0);
 
 	if (CanFire() && ensure(FireAnimSeq) && camera)
@@ -190,8 +215,21 @@ void ACHandgun::Fire()
 
 }
 
+void ACHandgun::OnRep_Owner()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Owner Replicated"));
+}
+
 void ACHandgun::Server_Fire_Implementation(FHitResult Hit)
 {
+	UE_LOG(LogTemp, Warning, TEXT("HandGun, Net: %s"), GetWorld()->GetNetMode() == NM_Client ? TEXT("Client") : TEXT("Server"));
+	if (HasAuthority())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Server?"));
+	}
+	else
+		UE_LOG(LogTemp, Warning, TEXT("client?"));
+
 	//플레이어가 맞았다면:
 	if (Hit.GetActor())
 	{
@@ -200,8 +238,23 @@ void ACHandgun::Server_Fire_Implementation(FHitResult Hit)
 		if (character)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Player hit: %s"), *character->GetPlayerState()->GetUniqueId().ToString());
-			
+
 			//플레이어 체력 줄여라.
+
+			//Move this to MyCharacter later
+			character->CurrHp -= 20.f;
+			if (character->CurrHp <= 0.f)
+			{
+
+				auto GM = GetWorld()->GetAuthGameMode<ARealGameMode>();
+				if (GM)
+				{
+					GM->OnPlayerDead(character);
+				}
+				character->PlayerDead();
+			}
+
+
 		}
 	}
 	InMagRemainingRounds--;

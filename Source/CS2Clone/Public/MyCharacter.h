@@ -28,6 +28,8 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	virtual void PossessedBy(AController* NewController) override;
 public:
@@ -73,7 +75,7 @@ public:
 	class USceneComponent* GunComponent;
 
 	
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(Replicated, EditAnywhere)
 	class ACHandgun* handGun;
 
 	UPROPERTY(EditAnywhere)

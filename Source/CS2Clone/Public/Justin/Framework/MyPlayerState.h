@@ -43,6 +43,7 @@ protected:
 	USkeletalMesh* FemaleMesh;
 	UPROPERTY(EditAnywhere)
 	USkeletalMesh* MaleMesh;
+
 private:
 	void SetTeamMesh(); 
 };

@@ -37,7 +37,7 @@ void AMyPlayerState::SetTeamMesh()
 		break;
 	case ETeam::TEAM_T:
 		if (TestCharacter)
-			TestCharacter->GetMesh()->SetSkeletalMesh(MaleMesh);
+			TestCharacter->GetMesh()->SetSkeletalMesh(MaleMesh); 
 		break;
 	}
 }
