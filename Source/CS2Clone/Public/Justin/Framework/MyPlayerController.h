@@ -43,12 +43,4 @@ private:
 	void Client_RespondServerTime(float SentClientTime, float CurrentServerTime);
 	UFUNCTION()
 	void SendServerTimeRequest();
-
-
-	//카운트다운 정보 처리
-	UFUNCTION(BlueprintCallable)
-	void StartTimer();
-	float DestTime;
-	float MarkedTime;
-	bool bStart = false;
 };

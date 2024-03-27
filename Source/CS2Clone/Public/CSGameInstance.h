@@ -8,7 +8,7 @@
 #include "CSGameInstance.generated.h"
 
 /**
- * 
+ *
  */
 UCLASS()
 class CS2CLONE_API UCSGameInstance : public UGameInstance
@@ -23,4 +23,9 @@ protected:
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<struct FItemType> defineItem;
+
+	void SetGameStarted(bool bStarted);
+	bool GetGameStarted() const;
+private:
+	bool bGameStarted;
 };
