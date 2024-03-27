@@ -10,6 +10,25 @@
 /**
  *
  */
+
+USTRUCT()
+struct FPlayerInfo
+{
+	GENERATED_BODY()
+public:
+	FPlayerInfo()
+	{
+		testing = 0;
+	};
+	FPlayerInfo(uint32 test)
+	{
+		testing = test;
+	}
+
+	UPROPERTY()
+	uint32 testing; 
+};
+
 UCLASS()
 class CS2CLONE_API UCSGameInstance : public UGameInstance
 {
@@ -24,8 +43,11 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<struct FItemType> defineItem;
 
-	void SetGameStarted(bool bStarted);
-	bool GetGameStarted() const;
+	UPROPERTY()
+	TMap<FString,FPlayerInfo> playerInfoMap;
+
+	void SetGameOnGoing(bool bStarted);
+	bool IsGameOnGoing() const;
 private:
-	bool bGameStarted;
+	bool bGameOngoing;
 };

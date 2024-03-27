@@ -33,12 +33,12 @@ void UCSGameInstance::Init()
 	Super::Init();
 }
 
-void UCSGameInstance::SetGameStarted(bool bStarted)
+void UCSGameInstance::SetGameOnGoing(bool bStarted)
 {
-	bGameStarted = bStarted;
+	bGameOngoing = bStarted;
 }
 
-bool UCSGameInstance::GetGameStarted() const
+bool UCSGameInstance::IsGameOnGoing() const
 {
-	return bGameStarted;
+	return bGameOngoing;
 }

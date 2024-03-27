@@ -20,7 +20,7 @@ void AMyPlayerState::BeginPlay()
 	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("PlayerID: %s"), ));
 }
 
-void AMyPlayerState::OnRep_Try()
+void AMyPlayerState::OnRep_TeamAssigned()
 {
 	//UE_LOG(LogTemp, Warning, TEXT("OnRep_Try"));
 	TestCharacter = TestCharacter ? TestCharacter : Cast<ACharacter>(GetPawn());

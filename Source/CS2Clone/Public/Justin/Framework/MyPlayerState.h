@@ -32,10 +32,10 @@ protected:
 	virtual void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const override;
 
 protected:
-	UPROPERTY(ReplicatedUsing = OnRep_Try)
+	UPROPERTY(ReplicatedUsing = OnRep_TeamAssigned)
 	ETeam TeamType;
 	UFUNCTION()
-	void OnRep_Try();
+	void OnRep_TeamAssigned();
 	UPROPERTY()
 	ACharacter* TestCharacter; 
 

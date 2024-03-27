@@ -33,6 +33,7 @@ private:
 	UPROPERTY()
 	TObjectPtr<UCSGameInstance> GameInstance;
 	void AssignTeam();
+	void UpdateTeam();
 
 	//카운트다운 정보 처리
 	UFUNCTION()

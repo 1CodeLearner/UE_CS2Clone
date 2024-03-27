@@ -12,7 +12,7 @@
 ARealGameMode::ARealGameMode()
 {
 	bDelayedStart = true;
-	CountDownTime = 15.f;
+	CountDownTime = 3.f;
 	DestTime = 10.f;
 	MarkedTime = 0.f;
 	bStart = false;
@@ -60,11 +60,6 @@ void ARealGameMode::InitGame(const FString& MapName, const FString& Options, FSt
 	* if game did not start - mark game as started.
 	* if game did start - skip delay start and start game immediately
 	*/
-	GameInstance = GetGameInstance<UCSGameInstance>();
-	if (GameInstance && !GameInstance->GetGameStarted())
-	{
-		GameInstance->SetGameStarted(true);
-	}
 }
 
 void ARealGameMode::HandleMatchIsWaitingToStart()
@@ -80,7 +75,16 @@ void ARealGameMode::HandleMatchHasStarted()
 
 	UE_LOG(LogTemp, Warning, TEXT("MatchStart"));
 
-	AssignTeam();
+	auto GI = GetWorld()->GetGameInstance<UCSGameInstance>();
+	if (GI && GI->IsGameOnGoing())
+	{
+		UpdateTeam();
+	}
+	else
+	{
+		GI->SetGameOnGoing(true);
+		AssignTeam();
+	}
 
 	FTimerHandle Handle;
 	GetWorld()->GetTimerManager().SetTimer(Handle, this, &ARealGameMode::RestartTest, 5.f, false);
@@ -106,7 +110,8 @@ void ARealGameMode::AssignTeam()
 		for (int i = 0; i < GS->PlayerArray.Num(); ++i)
 		{
 			auto PS = Cast<AMyPlayerState>(GS->PlayerArray[i]);
-			UE_LOG(LogTemp, Warning, TEXT("[%d]: PlayerId: %s"), i, *PS->GetUniqueId().ToString());
+
+			//assign team to player
 			if (ensure(PS) && ensureAlways(PS->TeamType == ETeam::TEAM_MAX))
 			{
 				if (GS->Team_CounterTerrorist.Num() < GS->Team_Terrorist.Num())
@@ -122,6 +127,33 @@ void ARealGameMode::AssignTeam()
 					GS->Team_Terrorist.Add(PS);
 				}
 			}
+
+			FString PlayerId = PS->GetUniqueId().ToString();
+			UE_LOG(LogTemp, Warning, TEXT("[%d]: PlayerId: %s"), i, *PlayerId);
+
+			//add Player info on Game instance
+			auto GI = GetWorld()->GetGameInstance<UCSGameInstance>();
+			GI->playerInfoMap.Add(PlayerId, FPlayerInfo());
+		}
+	}
+}
+
+void ARealGameMode::UpdateTeam()
+{
+	auto GS = GetGameState<AMyGameState>();
+	if (ensure(GS))
+	{
+		for (int i = 0; i < GS->PlayerArray.Num(); ++i)
+		{
+
+			auto GI = GetWorld()->GetGameInstance<UCSGameInstance>();
+			TMap<FString, FPlayerInfo>& playerMapping = GI->playerInfoMap;
+
+			auto PS = Cast<AMyPlayerState>(GS->PlayerArray[i]);
+			FString PlayerId = PS->GetUniqueId().ToString();
+
+			uint32 test = playerMapping[PlayerId].testing++;
+			UE_LOG(LogTemp, Warning, TEXT("Update: %d"), test);
 		}
 	}
 }
