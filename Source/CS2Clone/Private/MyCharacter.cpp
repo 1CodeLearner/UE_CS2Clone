@@ -31,11 +31,13 @@ AMyCharacter::AMyCharacter()
 	GetMesh()->SetRelativeLocation(FVector(0, 0, -88));
 	GetMesh()->SetRelativeRotation(FRotator(0, -90, 0));
 
-	//springArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("springArm"));
-	//springArm->SetupAttachment(RootComponent);
+	springArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("springArm"));
+	springArm->SetupAttachment(RootComponent);
+	springArm->SetWorldLocation(FVector(30, 0, 80));
+
 	camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
-	camera->SetupAttachment(RootComponent);
-	camera->SetWorldLocation(FVector(30, 0, 80));
+	camera->SetupAttachment(springArm);
+	camera->SetWorldLocation(FVector(0, 0, 0));
 
 	//invencomp
 	invenComp = CreateDefaultSubobject<UInventoryComponent>(TEXT("PlayerInventory"));
@@ -123,7 +125,7 @@ void AMyCharacter::EnhancedLook(const struct FInputActionValue& value)
 
 	AddControllerYawInput(dir.X);
 	AddControllerPitchInput(dir.Y);
-
+	
 }
 
 void AMyCharacter::EnhancedDrop(const struct FInputActionValue& value)
@@ -254,16 +256,19 @@ void AMyCharacter::MultiDetachGun_Implementation()
 	// 총 가지고 있으면
 	if (hasPistol)
 	{
+		
+		FVector GunLoc = GunComponent->GetComponentLocation();
+		//FVector DropLoc = GunComponent;
 		UE_LOG(LogTemp, Warning, TEXT("Drop Item"));
 		//총 손에서 제거
 		handGun->DetachFromActor(FDetachmentTransformRules::KeepRelativeTransform);
 		//필드에 총 스폰
-		GetWorld()->SpawnActor<ACInteractableItem>(invenComp->myItems[1].DroppedItemClass, GetActorLocation(), GetActorRotation());
+		GetWorld()->SpawnActor<ACInteractableItem>(invenComp->myItems[1].DroppedItemClass, GunLoc, GetActorRotation());
 		//비어있는 슬롯으로 바꿔치기
 		invenComp->myItems[1] = invenComp->myItems[0];
-
 		//총 안가지고있다
 		hasPistol = false;
+		handGun->Destroy();
 	}
 		anim->hasPistol = false;
 
@@ -284,9 +289,9 @@ void AMyCharacter::MultiPlayerFire_Implementation()
 	//if(handGun == nullptr) return;
 	//hasPistol이 true 면 내려가고 false 리턴
 	if (!hasPistol) return;
+	PlayAnimMontage(pistolMontage, 1.0f, FName(TEXT("Fire")));
 	if (IsLocallyControlled())
 	{
-		PlayAnimMontage(pistolMontage, 1.0f, FName(TEXT("Fire")));
 		handGun->Fire();
 	}
 }
@@ -319,6 +324,7 @@ void AMyCharacter::PlayerDead()
 void AMyCharacter::ServerDead_Implementation()
 {
 	MultiDead();
+	
 }
 
 void AMyCharacter::MultiDead_Implementation()
@@ -333,8 +339,9 @@ void AMyCharacter::MultiDead_Implementation()
 		GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		// Movement 컴포넌트 비활성
 		GetCharacterMovement()->DisableMovement();
-		
+		//springArm->bUsePawnControlRotation = false;
 		MultiDetachGun();
+		Destroy();
 	}
 
 }

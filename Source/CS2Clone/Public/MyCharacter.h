@@ -76,9 +76,13 @@ public:
 	UPROPERTY(EditAnywhere)
 	class ACHandgun* handGun;
 
+	UPROPERTY(EditAnywhere)
+	class USpringArmComponent* springArm;
+
 	//camera
 	UPROPERTY(EditAnywhere)
 	class UCameraComponent* camera;
+
 
 public:
 	bool hasPistol = false;
