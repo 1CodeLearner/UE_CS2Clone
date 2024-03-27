@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Engine/GameInstance.h"
 #include "Justin/ItemTypes.h"
+#include "Justin/Framework/MyPlayerState.h"
 #include "CSGameInstance.generated.h"
 
 /**
@@ -19,14 +20,19 @@ public:
 	FPlayerInfo()
 	{
 		testing = 0;
+		TeamType = ETeam::TEAM_MAX;
 	};
-	FPlayerInfo(uint32 test)
+	FPlayerInfo(uint32 test, ETeam team)
 	{
 		testing = test;
+		TeamType = team;
 	}
 
 	UPROPERTY()
 	uint32 testing; 
+
+	UPROPERTY()
+	ETeam TeamType;
 };
 
 UCLASS()

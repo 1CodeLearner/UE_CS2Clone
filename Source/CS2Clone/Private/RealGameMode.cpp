@@ -133,7 +133,8 @@ void ARealGameMode::AssignTeam()
 
 			//add Player info on Game instance
 			auto GI = GetWorld()->GetGameInstance<UCSGameInstance>();
-			GI->playerInfoMap.Add(PlayerId, FPlayerInfo());
+			uint32 rand = FMath::RandRange(0,10);
+			GI->playerInfoMap.Add(PlayerId, FPlayerInfo(rand,PS->TeamType));
 		}
 	}
 }
@@ -152,8 +153,12 @@ void ARealGameMode::UpdateTeam()
 			auto PS = Cast<AMyPlayerState>(GS->PlayerArray[i]);
 			FString PlayerId = PS->GetUniqueId().ToString();
 
-			uint32 test = playerMapping[PlayerId].testing++;
-			UE_LOG(LogTemp, Warning, TEXT("Update: %d"), test);
+			uint32 rand = playerMapping[PlayerId].testing++;
+			ETeam team = playerMapping[PlayerId].TeamType;
+			UE_LOG(LogTemp, Warning, TEXT("Update: %d, %s"), rand, *UEnum::GetValueAsString(team));
+
+			PS->TeamType = team; 
+			PS->SetTeamMesh();
 		}
 	}
 }
