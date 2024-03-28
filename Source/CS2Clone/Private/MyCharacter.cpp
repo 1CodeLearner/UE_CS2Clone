@@ -295,7 +295,8 @@ void AMyCharacter::PlayerFIre()
 
 void AMyCharacter::ServerPlayerFire_Implementation()
 {
-	MultiPlayerFire();
+	MultiPlayerFire();	
+	
 }
 
 void AMyCharacter::MultiPlayerFire_Implementation()
@@ -305,7 +306,6 @@ void AMyCharacter::MultiPlayerFire_Implementation()
 	if (!hasPistol) return;
 	if (handGun->CanFire())
 	{
-
 		PlayAnimMontage(pistolMontage, 1.0f, FName(TEXT("Fire")));
 		if (IsLocallyControlled())
 		{
@@ -326,13 +326,11 @@ void AMyCharacter::ServerReload_Implementation()
 
 void AMyCharacter::MultiReload_Implementation()
 {
-
-	//if (hasPistol && invenComp->myItems[1].InventorySlotType == EInventorySlotType::INV_MAX) return;
 	if (!hasPistol) return;
 	if (handGun->CanReload())
 	{
-	PlayAnimMontage(pistolMontage, 1.0f, FName(TEXT("Reload")));
-	handGun->Reload();
+		PlayAnimMontage(pistolMontage, 1.0f, FName(TEXT("Reload")));
+		handGun->Reload();
 	}
 }
 
@@ -349,7 +347,6 @@ void AMyCharacter::ServerDead_Implementation()
 
 void AMyCharacter::MultiDead_Implementation()
 {
-	CurrHp = 0;
 	if (CurrHp <= 0)
 	{
 		anim->isDeath = true;
@@ -362,15 +359,12 @@ void AMyCharacter::MultiDead_Implementation()
 		GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		// Movement 컴포넌트 비활성
 		GetCharacterMovement()->DisableMovement();
-		//springArm->bUsePawnControlRotation = false;
 		MultiDetachGun();
 		AMyPlayerController* pc = Cast<AMyPlayerController>(GetController()); 
 		auto spectatorTest = GetWorld()->SpawnActor<ASpectatorPawn>(GetWorld()->GetAuthGameMode()->SpectatorClass, GetActorLocation(), GetActorRotation());
 		
 		pc->Possess(spectatorTest);
-		
-		//GetWorld()->GetAuthGameMode()->SpectatorClass
-		//Destroy();
+		Destroy();
 		}
 	}
 }
