@@ -14,6 +14,11 @@
 #include <../../../../../../../Source/Runtime/Engine/Classes/Components/CapsuleComponent.h>
 #include <../../../../../../../Source/Runtime/Engine/Classes/GameFramework/CharacterMovementComponent.h>
 
+#include "Net/UnrealNetwork.h"
+#include "Justin/Framework/MyPlayerController.h"
+#include <../../../../../../../Source/Runtime/Engine/Classes/GameFramework/GameModeBase.h>
+#include "GameFramework/SpectatorPawn.h"
+
 // Sets default values
 AMyCharacter::AMyCharacter()
 {
@@ -96,6 +101,13 @@ void AMyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 		enhancedInputComponent->BindAction(ia_Fire, ETriggerEvent::Started, this, &AMyCharacter::EnhancedFire);
 		enhancedInputComponent->BindAction(ia_Reload, ETriggerEvent::Started, this, &AMyCharacter::EnhancedReload);
 	}
+}
+
+void AMyCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(AMyCharacter, handGun);
 }
 
 void AMyCharacter::PossessedBy(AController* NewController)
@@ -224,11 +236,13 @@ void AMyCharacter::MultiAttachGun_Implementation()
 	if (!hasPistol) // true면 내려가 
 	{
 		// 핸드건 스폰
-		handGun = GetWorld()->SpawnActor<ACHandgun>(invenComp->myItems[1].GameplayItemClass, GetActorLocation(), GetActorRotation());
-		if (handGun != nullptr)
-			// 핸드건을 건 컴포넌트에 붙이기
-			handGun->AttachToComponent(GunComponent, FAttachmentTransformRules::SnapToTargetIncludingScale);
-
+		if (HasAuthority()) 
+		{
+			handGun = GetWorld()->SpawnActor<ACHandgun>(invenComp->myItems[1].GameplayItemClass, GetActorLocation(), GetActorRotation());
+			if (handGun != nullptr)
+				// 핸드건을 건 컴포넌트에 붙이기
+				handGun->AttachToComponent(GunComponent, FAttachmentTransformRules::SnapToTargetIncludingScale);
+		}
 		//핸드건 가지고있다
 		hasPistol = true;
 		if(HasAuthority())
@@ -289,10 +303,14 @@ void AMyCharacter::MultiPlayerFire_Implementation()
 	//if(handGun == nullptr) return;
 	//hasPistol이 true 면 내려가고 false 리턴
 	if (!hasPistol) return;
-	PlayAnimMontage(pistolMontage, 1.0f, FName(TEXT("Fire")));
-	if (IsLocallyControlled())
+	if (handGun->CanFire())
 	{
-		handGun->Fire();
+
+		PlayAnimMontage(pistolMontage, 1.0f, FName(TEXT("Fire")));
+		if (IsLocallyControlled())
+		{
+			handGun->Fire();
+		}
 	}
 }
 
@@ -311,9 +329,11 @@ void AMyCharacter::MultiReload_Implementation()
 
 	//if (hasPistol && invenComp->myItems[1].InventorySlotType == EInventorySlotType::INV_MAX) return;
 	if (!hasPistol) return;
-
+	if (handGun->CanReload())
+	{
 	PlayAnimMontage(pistolMontage, 1.0f, FName(TEXT("Reload")));
 	handGun->Reload();
+	}
 }
 
 void AMyCharacter::PlayerDead()
@@ -332,8 +352,11 @@ void AMyCharacter::MultiDead_Implementation()
 	CurrHp = 0;
 	if (CurrHp <= 0)
 	{
-		UE_LOG(LogTemp,Warning, TEXT("dead"));
 		anim->isDeath = true;
+		if (HasAuthority())
+		{
+
+		UE_LOG(LogTemp,Warning, TEXT("dead"));
 		// 충돌 안되게
 		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
@@ -341,8 +364,14 @@ void AMyCharacter::MultiDead_Implementation()
 		GetCharacterMovement()->DisableMovement();
 		//springArm->bUsePawnControlRotation = false;
 		MultiDetachGun();
-		Destroy();
+		AMyPlayerController* pc = Cast<AMyPlayerController>(GetController()); 
+		auto spectatorTest = GetWorld()->SpawnActor<ASpectatorPawn>(GetWorld()->GetAuthGameMode()->SpectatorClass, GetActorLocation(), GetActorRotation());
+		
+		pc->Possess(spectatorTest);
+		
+		//GetWorld()->GetAuthGameMode()->SpectatorClass
+		//Destroy();
+		}
 	}
-
 }
 

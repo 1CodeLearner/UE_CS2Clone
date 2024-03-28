@@ -76,6 +76,7 @@ public:
 
 	
 	UPROPERTY(Replicated, EditAnywhere)
+	//UPROPERTY(EditAnywhere)
 	class ACHandgun* handGun;
 
 	UPROPERTY(EditAnywhere)
