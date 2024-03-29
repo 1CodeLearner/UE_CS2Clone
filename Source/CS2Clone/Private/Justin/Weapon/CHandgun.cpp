@@ -189,6 +189,7 @@ void ACHandgun::Fire()
 	//	}
 
 	//}
+	
 	AActor* camera = UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0);
 
 	if (CanFire() && ensure(FireAnimSeq) && camera)
