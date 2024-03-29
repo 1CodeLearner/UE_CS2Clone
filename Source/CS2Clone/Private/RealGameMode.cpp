@@ -8,14 +8,33 @@
 #include "Justin/Framework/MyPlayerState.h"
 #include "Justin/Framework/MyGameState.h"
 #include "CSGameInstance.h"
+#include "Justin/Framework/MyGameState.h"
 
 ARealGameMode::ARealGameMode()
 {
 	bDelayedStart = true;
-	CountDownTime = 3.f;
+	CountDownTime = 6.f;
 	DestTime = 10.f;
 	MarkedTime = 0.f;
 	bStart = false;
+}
+
+void ARealGameMode::OnPlayerDead(AMyCharacter* character)
+{
+	bool isMatchOver = false;
+	if (GS)
+	{
+		GS->OnPlayerDead(character, isMatchOver);
+	}
+
+	if (isMatchOver)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Match is over? %s"), isMatchOver ? TEXT("YES") : TEXT("NO"));
+
+		//instead of using this function, use WaitingPostMatch MatchState from AGameMode
+		FTimerHandle Handle;
+		GetWorld()->GetTimerManager().SetTimer(Handle, this, &ARealGameMode::RestartTest, 5.f, false);
+	}
 }
 
 void ARealGameMode::Tick(float DeltaSeconds)
@@ -55,11 +74,21 @@ void ARealGameMode::InitGame(const FString& MapName, const FString& Options, FSt
 {
 	Super::InitGame(MapName, Options, ErrorMessage);
 	UE_LOG(LogTemp, Warning, TEXT("InitGame"));
-
 	/*
 	* if game did not start - mark game as started.
 	* if game did start - skip delay start and start game immediately
 	*/
+}
+
+void ARealGameMode::BeginPlay()
+{
+	Super::BeginPlay();
+
+	GS = Cast<AMyGameState>(GameState);
+	if (ensure(GS))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("GameState created %s "), *GetNameSafe(GS));
+	}
 }
 
 void ARealGameMode::HandleMatchIsWaitingToStart()
@@ -85,9 +114,6 @@ void ARealGameMode::HandleMatchHasStarted()
 		GI->SetGameOnGoing(true);
 		AssignTeam();
 	}
-
-	/*FTimerHandle Handle;
-	GetWorld()->GetTimerManager().SetTimer(Handle, this, &ARealGameMode::RestartTest, 5.f, false);*/
 }
 
 void ARealGameMode::HandleLeavingMap()
@@ -104,7 +130,6 @@ void ARealGameMode::RestartTest()
 
 void ARealGameMode::AssignTeam()
 {
-	auto GS = GetGameState<AMyGameState>();
 	if (ensure(GS))
 	{
 		for (int i = 0; i < GS->PlayerArray.Num(); ++i)
@@ -141,7 +166,6 @@ void ARealGameMode::AssignTeam()
 
 void ARealGameMode::UpdateTeam()
 {
-	auto GS = GetGameState<AMyGameState>();
 	if (ensure(GS))
 	{
 		for (int i = 0; i < GS->PlayerArray.Num(); ++i)

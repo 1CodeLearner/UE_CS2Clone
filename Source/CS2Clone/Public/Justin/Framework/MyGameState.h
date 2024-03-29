@@ -19,7 +19,6 @@ class CS2CLONE_API AMyGameState : public AGameState
 
 	friend class ARealGameMode;
 public:
-	void OnPlayerDead(AMyCharacter* character);
 
 protected:
 	virtual void GetLifetimeReplicatedProps(TArray< FLifetimeProperty > &OutLifetimeProps) const override;
@@ -38,5 +37,5 @@ protected:
 	TArray<AMyPlayerState*> Team_Terrorist;
 private:
 	bool IsTeamEliminated(const TArray<AMyPlayerState*>& Team);
-
+	void OnPlayerDead(AMyCharacter* character, bool& bIsMatchOver);
 };

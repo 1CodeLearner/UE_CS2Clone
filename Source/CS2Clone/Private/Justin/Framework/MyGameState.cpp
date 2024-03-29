@@ -18,8 +18,9 @@ void AMyGameState::OnRep_ScoreUpdate()
 	UE_LOG(LogTemp, Warning, TEXT("CT: %d, T: %d"), CT_Score, T_Score);
 }
 
-void AMyGameState::OnPlayerDead(AMyCharacter* character)
+void AMyGameState::OnPlayerDead(AMyCharacter* character, bool& bIsMatchOver)
 {
+	bIsMatchOver = false;
 	if (character)
 	{
 		auto PS = Cast<AMyPlayerState>(character->GetPlayerState());
@@ -33,6 +34,7 @@ void AMyGameState::OnPlayerDead(AMyCharacter* character)
 			if (IsTeamEliminated(Team_CounterTerrorist))
 			{
 				CT_Score++;
+				bIsMatchOver = true;
 			}
 		}
 		else
@@ -40,6 +42,7 @@ void AMyGameState::OnPlayerDead(AMyCharacter* character)
 			if (IsTeamEliminated(Team_Terrorist))
 			{
 				T_Score++;
+				bIsMatchOver = true;
 			}
 		}
 	}

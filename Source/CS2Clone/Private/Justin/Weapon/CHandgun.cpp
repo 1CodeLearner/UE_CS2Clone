@@ -250,11 +250,7 @@ void ACHandgun::Server_Fire_Implementation(FHitResult Hit)
 				auto GM = GetWorld()->GetAuthGameMode<ARealGameMode>();
 				if (GM)
 				{
-					auto GS = GM->GetGameState<AMyGameState>();
-					if (GS) 
-					{
-						GS->OnPlayerDead(character);
-					}
+					GM->OnPlayerDead(character);
 				}
 				character->PlayerDead();
 			}

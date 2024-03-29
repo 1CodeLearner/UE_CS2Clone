@@ -8,6 +8,7 @@
 
 class UCSGameInstance; 
 class AMyCharacter; 
+class AMyGameState;
 /**
  *
  */
@@ -18,6 +19,7 @@ class CS2CLONE_API ARealGameMode : public AGameMode
 public:
 	ARealGameMode();
 
+	void OnPlayerDead(AMyCharacter* character);
 
 protected:
 	virtual void Tick(float DeltaSeconds) override;
@@ -25,15 +27,18 @@ protected:
 
 	virtual void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage) override;
 
+	virtual void BeginPlay() override;
+
 	virtual void HandleMatchIsWaitingToStart() override; 
 	virtual void HandleMatchHasStarted() override;
 	virtual void HandleLeavingMap() override;
 
+	//instead of using this function, use WaitingPostMatch MatchState from AGameMode
 	UFUNCTION()
 	void RestartTest();
 private:
 	UPROPERTY()
-	TObjectPtr<UCSGameInstance> GameInstance;
+	TObjectPtr<AMyGameState> GS;
 	void AssignTeam();
 	void UpdateTeam();
 
