@@ -18,8 +18,6 @@ class CS2CLONE_API ARealGameMode : public AGameMode
 public:
 	ARealGameMode();
 
-	UFUNCTION()
-	void OnPlayerDead(AMyCharacter* character);
 
 protected:
 	virtual void Tick(float DeltaSeconds) override;

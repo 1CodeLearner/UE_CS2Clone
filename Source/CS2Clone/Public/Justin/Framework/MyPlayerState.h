@@ -27,6 +27,9 @@ class CS2CLONE_API AMyPlayerState : public APlayerState
 public:
 	AMyPlayerState();
 	void SetCharacter(ACharacter* Controlled); 
+	void SetDead(bool bIsDead);
+	bool GetDead();
+
 protected:
 	virtual void BeginPlay() override;
 	virtual void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const override;
@@ -43,6 +46,11 @@ protected:
 	USkeletalMesh* FemaleMesh;
 	UPROPERTY(EditAnywhere)
 	USkeletalMesh* MaleMesh;
+
+	UPROPERTY(ReplicatedUsing = OnRep_Dead)
+	bool bDead; 
+	UFUNCTION()
+	void OnRep_Dead();
 
 private:
 	void SetTeamMesh(); 

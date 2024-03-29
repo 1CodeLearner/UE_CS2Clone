@@ -27,6 +27,11 @@ void AMyPlayerState::OnRep_TeamAssigned()
 	SetTeamMesh();
 }
 
+void AMyPlayerState::OnRep_Dead()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Dead %s"), *GetNameSafe(TestCharacter));
+}
+
 void AMyPlayerState::SetTeamMesh()
 {
 	switch (TeamType)
@@ -53,4 +58,14 @@ void AMyPlayerState::SetCharacter(ACharacter* Controlled)
 {
 	if (Controlled)
 		TestCharacter = Controlled;
+}
+
+void AMyPlayerState::SetDead(bool bIsDead)
+{
+	bDead = bIsDead;
+}
+
+bool AMyPlayerState::GetDead()
+{
+	return bDead;
 }

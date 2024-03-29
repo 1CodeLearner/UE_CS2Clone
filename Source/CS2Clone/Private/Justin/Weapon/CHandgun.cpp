@@ -11,6 +11,7 @@
 #include "GameFramework/PlayerState.h"
 #include "RealGameMode.h"
 #include "Justin/Framework/MyPlayerController.h"
+#include "Justin/Framework/MyGameState.h"
 
 ACHandgun::ACHandgun()
 {
@@ -245,11 +246,14 @@ void ACHandgun::Server_Fire_Implementation(FHitResult Hit)
 			character->CurrHp -= 20.f;
 			if (character->CurrHp <= 0.f)
 			{
-
 				auto GM = GetWorld()->GetAuthGameMode<ARealGameMode>();
 				if (GM)
 				{
-					GM->OnPlayerDead(character);
+					auto GS = GM->GetGameState<AMyGameState>();
+					if (GS) 
+					{
+						GS->OnPlayerDead(character);
+					}
 				}
 				character->PlayerDead();
 			}

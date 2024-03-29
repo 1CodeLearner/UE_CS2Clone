@@ -3,6 +3,7 @@
 
 #include "Justin/Framework/MyGameState.h"
 #include "Net/UnrealNetwork.h"
+#include "Justin/Framework/MyPlayerState.h"
 
 void AMyGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
@@ -14,5 +15,41 @@ void AMyGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLife
 
 void AMyGameState::OnRep_ScoreUpdate()
 {
-	UE_LOG(LogTemp, Warning, TEXT("CT: %d, T: %d"), CT_Score,T_Score);
+	UE_LOG(LogTemp, Warning, TEXT("CT: %d, T: %d"), CT_Score, T_Score);
+}
+
+void AMyGameState::OnPlayerDead(AMyCharacter* character)
+{
+	if (character)
+	{
+		auto PS = Cast<AMyPlayerState>(character->GetPlayerState());
+		if (PS)
+		{
+			PS->SetDead(true);
+		}
+
+		if (Team_CounterTerrorist.Contains(PS))
+		{
+			if (IsTeamEliminated(Team_CounterTerrorist))
+			{
+				CT_Score++;
+			}
+		}
+		else
+		{
+			if (IsTeamEliminated(Team_Terrorist))
+			{
+				T_Score++;
+			}
+		}
+	}
+}
+
+bool AMyGameState::IsTeamEliminated(const TArray<AMyPlayerState*>& Team)
+{
+	for (auto i : Team) {
+		if(!i->GetDead())
+			return false;
+	}
+	return true;
 }

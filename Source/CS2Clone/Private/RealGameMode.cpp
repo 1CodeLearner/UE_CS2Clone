@@ -18,26 +18,6 @@ ARealGameMode::ARealGameMode()
 	bStart = false;
 }
 
-void ARealGameMode::OnPlayerDead(AMyCharacter* character)
-{
-	if (character)
-	{
-		auto PS = Cast<AMyPlayerState>(character->GetPlayerState());
-		if (PS)
-		{
-			auto GS = Cast<AMyGameState>(GameState);
-			if (GS && GS->Team_CounterTerrorist.Contains(PS))
-			{
-				GS->T_Score++;
-			}
-			else
-			{
-				GS->CT_Score++;
-			}
-		}
-	}
-}
-
 void ARealGameMode::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);

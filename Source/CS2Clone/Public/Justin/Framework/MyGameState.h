@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameState.h"
+#include "MyCharacter.h"
 #include "MyGameState.generated.h"
 
 /**
@@ -18,9 +19,11 @@ class CS2CLONE_API AMyGameState : public AGameState
 
 	friend class ARealGameMode;
 public:
-	void SetScore();
+	void OnPlayerDead(AMyCharacter* character);
+
 protected:
 	virtual void GetLifetimeReplicatedProps(TArray< FLifetimeProperty > &OutLifetimeProps) const override;
+
 protected:
 
 	UPROPERTY(ReplicatedUsing = OnRep_ScoreUpdate)
@@ -33,4 +36,7 @@ protected:
 
 	TArray<AMyPlayerState*> Team_CounterTerrorist;
 	TArray<AMyPlayerState*> Team_Terrorist;
+private:
+	bool IsTeamEliminated(const TArray<AMyPlayerState*>& Team);
+
 };
