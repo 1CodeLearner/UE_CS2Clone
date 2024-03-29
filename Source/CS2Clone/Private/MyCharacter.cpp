@@ -365,6 +365,7 @@ void AMyCharacter::MultiDead_Implementation()
 		
 		pc->Possess(spectatorTest);
 		Destroy();
+		
 		}
 	}
 }
