@@ -38,6 +38,7 @@ protected:
 	TArray<AMyPlayerState*> Team_CounterTerrorist;
 	TArray<AMyPlayerState*> Team_Terrorist;
 			
+	UPROPERTY(Replicated)
 	ETeam ETeamWon;
 
 private:

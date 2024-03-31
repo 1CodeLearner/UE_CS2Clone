@@ -6,6 +6,8 @@
 #include "RealGameMode.h"
 #include "Justin/Framework/MyPlayerState.h"
 #include "GameFramework/Character.h"
+#include "Net/UnrealNetwork.h"
+#include "Blueprint/WidgetLayoutLibrary.h"
 
 AMyPlayerController::AMyPlayerController()
 {
@@ -14,7 +16,7 @@ AMyPlayerController::AMyPlayerController()
 	DeltaTime = 0.f;
 }
 
-void AMyPlayerController::DisplayGameplay()
+void AMyPlayerController::DisplayResult()
 {
 	if (!GameplayDisplay && ensure(GameplayDisplayClass))
 	{
@@ -45,6 +47,13 @@ void AMyPlayerController::BeginPlay()
 void AMyPlayerController::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
+}
+
+void AMyPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(AMyPlayerController, MatchState);
 }
 
 void AMyPlayerController::SendServerTimeRequest()
@@ -86,5 +95,20 @@ void AMyPlayerController::OnPossess(APawn* aPawn)
 	else
 	{
 		UE_LOG(LogTemp, Warning, TEXT("No PlayerState?"));
+	}
+}
+
+void AMyPlayerController::SetMatchState(FName CurrMatchState)
+{
+	MatchState = CurrMatchState;
+	if (IsLocalController())
+		OnRep_OnMatchStateChanged();
+}
+
+void AMyPlayerController::OnRep_OnMatchStateChanged()
+{
+	if (MatchState == MatchState::Cooldown) {
+		UWidgetLayoutLibrary::RemoveAllWidgets(GetWorld());
+		UE_LOG(LogTemp, Warning, TEXT("[%s]: MatchState: %s"), *GetNameSafe(this), *MatchState::Cooldown.ToString());
 	}
 }

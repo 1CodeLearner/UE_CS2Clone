@@ -35,6 +35,8 @@ protected:
 
 	virtual void BeginPlay() override;
 
+	virtual void OnMatchStateSet() override;
+
 	virtual void HandleMatchIsWaitingToStart() override; 
 	virtual void HandleMatchHasStarted() override;
 	virtual void HandleLeavingMap() override;
@@ -57,6 +59,8 @@ private:
 	//카운트다운 정보 처리
 	UFUNCTION()
 	void StartTimer();
+
+	void StartCooldown();
 
 	float DestTime;
 	float MarkedTime;

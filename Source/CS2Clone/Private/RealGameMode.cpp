@@ -9,6 +9,7 @@
 #include "Justin/Framework/MyGameState.h"
 #include "CSGameInstance.h"
 #include "Justin/Framework/MyGameState.h"
+#include "EngineUtils.h"
 
 namespace MatchState
 {
@@ -44,9 +45,12 @@ void ARealGameMode::OnPlayerDead(AMyCharacter* character)
 		isMatchOver = true;
 	}
 
-	if (isMatchOver) {
-		FTimerHandle Handle;
-		GetWorld()->GetTimerManager().SetTimer(Handle, this, &ARealGameMode::RestartTest, 5.f, false);
+	if (isMatchOver) {		
+		//GetWorld()->ServerTravel("'/Game/Level_Gameplay.Level_Gameplay'",GetTravelType()); // doesn't load clients property
+		//RestartTest();
+		SetMatchState(MatchState::Cooldown);
+		/*FTimerHandle Handle;
+		GetWorld()->GetTimerManager().SetTimer(Handle, this, &ARealGameMode::RestartTest, 5.f, false);*/
 	}
 	//instead of using this function, use WaitingPostMatch MatchState from AGameMode
 
@@ -77,6 +81,13 @@ void ARealGameMode::Tick(float DeltaSeconds)
 	}
 }
 
+void ARealGameMode::StartTimer()
+{
+	MarkedTime = GetWorld()->GetTimeSeconds();
+	DestTime = MarkedTime + CountDownTime;
+	bStart = true;
+}
+
 void ARealGameMode::PostLogin(APlayerController* NewPlayer)
 {
 	Super::PostLogin(NewPlayer);
@@ -101,6 +112,19 @@ void ARealGameMode::BeginPlay()
 	Super::BeginPlay();
 
 	GS = Cast<AMyGameState>(GameState);
+}
+
+void ARealGameMode::OnMatchStateSet()
+{
+	Super::OnMatchStateSet();
+
+	if(MatchState == MatchState::Cooldown){
+		for(auto i : TActorRange<AMyPlayerController>(GetWorld())){
+			if(i){
+				i->SetMatchState(MatchState);
+			}
+		}
+	}
 }
 
 void ARealGameMode::HandleMatchIsWaitingToStart()
@@ -205,9 +229,7 @@ void ARealGameMode::UpdateTeam()
 	}
 }
 
-void ARealGameMode::StartTimer()
+void ARealGameMode::StartCooldown()
 {
-	MarkedTime = GetWorld()->GetTimeSeconds();
-	DestTime = MarkedTime + CountDownTime;
-	bStart = true;
+	SetMatchState(MatchState::Cooldown);
 }
