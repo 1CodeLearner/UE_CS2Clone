@@ -22,6 +22,9 @@ class CS2CLONE_API AMyGameState : public AGameState
 	friend class ARealGameMode;
 public:
 	AMyGameState();
+
+	UPROPERTY(Replicated)
+	ETeam EWinner;
 protected:
 	virtual void GetLifetimeReplicatedProps(TArray< FLifetimeProperty > &OutLifetimeProps) const override;
 

@@ -57,7 +57,7 @@ public:
 
 protected:
 	virtual void Init() override;
-
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const;
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<struct FItemType> defineItem;
@@ -71,5 +71,6 @@ public:
 	void SetGameOnGoing(bool bStarted);
 	bool IsGameOnGoing() const;
 private:
+	UPROPERTY(Replicated)
 	bool bGameOngoing;
 };

@@ -13,6 +13,7 @@ class AMyGameState;
 namespace MatchState
 {
 	extern CS2CLONE_API const FName Cooldown;
+	extern CS2CLONE_API const FName GameFinished;
 }
 
 /**

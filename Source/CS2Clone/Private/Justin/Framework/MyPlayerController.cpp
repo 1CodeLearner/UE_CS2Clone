@@ -8,6 +8,7 @@
 #include "GameFramework/Character.h"
 #include "Net/UnrealNetwork.h"
 #include "Blueprint/WidgetLayoutLibrary.h"
+#include "Justin/Framework/MyGameState.h"
 
 AMyPlayerController::AMyPlayerController()
 {
@@ -100,15 +101,74 @@ void AMyPlayerController::OnPossess(APawn* aPawn)
 
 void AMyPlayerController::SetMatchState(FName CurrMatchState)
 {
-	MatchState = CurrMatchState;
+	MatchState = FMatchState(MatchState.Winner, CurrMatchState);
+
 	if (IsLocalController())
 		OnRep_OnMatchStateChanged();
 }
 
 void AMyPlayerController::OnRep_OnMatchStateChanged()
 {
-	if (MatchState == MatchState::Cooldown) {
+	if (MatchState.CurrentState == MatchState::Cooldown) {
 		UWidgetLayoutLibrary::RemoveAllWidgets(GetWorld());
 		UE_LOG(LogTemp, Warning, TEXT("[%s]: MatchState: %s"), *GetNameSafe(this), *MatchState::Cooldown.ToString());
 	}
+	else if (MatchState.CurrentState == MatchState::GameFinished) {
+		UE_LOG(LogTemp, Warning, TEXT("[%s]: MatchState: %s"), *GetNameSafe(this), *MatchState::GameFinished.ToString());
+
+		if (HasAuthority()) {
+			auto GS = GetWorld()->GetGameState<AMyGameState>();
+			FString string;
+			if (GS) {
+				switch (GS->EWinner) {
+				case ETeam::TEAM_CT:
+					string = FString::Printf(TEXT("CounterTerrorists Wins"));
+					break;
+				case ETeam::TEAM_T:
+					string = FString::Printf(TEXT("Terrorists Wins"));
+					break;
+				}
+			}
+			DisplayResult();
+
+			FText text = FText::FromString(string);
+			GameplayDisplay->SetWinner(text);
+		}
+		else{
+			Server_RequestWinner();
+		}
+	}
+	else
+		GameplayDisplay->RemoveFromParent();
+
+
+
+}
+
+void AMyPlayerController::Server_RequestWinner_Implementation()
+{
+	auto GS = GetWorld()->GetGameState<AMyGameState>();
+
+	FString string;
+	if (GS) {
+		switch (GS->EWinner) {
+		case ETeam::TEAM_CT:
+			string = FString::Printf(TEXT("CounterTerrorists Wins"));
+			break;
+		case ETeam::TEAM_T:
+			string = FString::Printf(TEXT("Terrorists Wins"));
+			break;
+		}
+	}
+
+	Client_RespondWinner(string);
+}
+
+void AMyPlayerController::Client_RespondWinner_Implementation(const FString& teamWon)
+{
+	DisplayResult();
+
+	FText text = FText::FromString(teamWon);
+	GameplayDisplay->SetWinner(text);
+
 }

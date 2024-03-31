@@ -5,10 +5,12 @@
 #include "Net/UnrealNetwork.h"
 #include "Justin/Framework/MyPlayerState.h"
 #include "RealGameMode.h"
+#include "Justin/Framework/MyPlayerController.h"
 
 AMyGameState::AMyGameState()
 {
 	ETeamWon = ETeam::TEAM_MAX;
+	EWinner = ETeam::TEAM_MAX;
 }
 
 void AMyGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -52,13 +54,25 @@ void AMyGameState::OnPlayerDead(AMyCharacter* character)
 				OnRep_ScoreUpdate();
 			}
 		}
+
+		auto PC = character->GetController<AMyPlayerController>();
+		if (PC) {
+			if (CT_Score == 1) {
+				EWinner = ETeam::TEAM_CT;
+				PC->MatchState.Winner = ETeam::TEAM_CT;
+			}
+			else if (T_Score == 1) {
+				PC->MatchState.Winner = ETeam::TEAM_T;
+				EWinner = ETeam::TEAM_T;
+			}
+		}
 	}
 }
 
 bool AMyGameState::IsTeamEliminated(const TArray<AMyPlayerState*>& Team)
 {
 	for (auto i : Team) {
-		if(!i->GetDead())
+		if (!i->GetDead())
 			return false;
 	}
 	return true;

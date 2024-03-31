@@ -11,19 +11,34 @@
  */
 
 class UGameplayDisplay;
+enum class ETeam : uint8;
+
+USTRUCT()
+struct FMatchState
+{
+	GENERATED_BODY()
+
+	UPROPERTY()
+	ETeam Winner;
+	UPROPERTY()
+	FName CurrentState;
+};
 
 UCLASS()
 class CS2CLONE_API AMyPlayerController : public APlayerController
 {
 	GENERATED_BODY()
-	friend class ARealGameMode; 
+	friend class ARealGameMode;
 
 public:
 	AMyPlayerController();
+
+	UPROPERTY(ReplicatedUsing = "OnRep_OnMatchStateChanged")
+	FMatchState MatchState;
 protected:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaSeconds) override;
-	
+
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 protected:
 
@@ -32,16 +47,20 @@ protected:
 	TSubclassOf<UGameplayDisplay> GameplayDisplayClass;
 	UPROPERTY()
 	TObjectPtr<UGameplayDisplay> GameplayDisplay;
-	virtual void OnPossess(APawn* aPawn) override;	
+	virtual void OnPossess(APawn* aPawn) override;
 
 	virtual void SetMatchState(FName CurrMatchState);
 
 private:
-	UPROPERTY(ReplicatedUsing = "OnRep_OnMatchStateChanged")
-	FName MatchState;
 	UFUNCTION()
 	void OnRep_OnMatchStateChanged();
 	void DisplayResult();
+
+	UFUNCTION(Server, Reliable)
+	void Server_RequestWinner();
+	UFUNCTION(Client, Reliable)
+	void Client_RespondWinner(const FString& teamWon);
+
 
 	//서버 시간 동기화
 	float GetServerTime() const;
@@ -53,4 +72,5 @@ private:
 	void Client_RespondServerTime(float SentClientTime, float CurrentServerTime);
 	UFUNCTION()
 	void SendServerTimeRequest();
+
 };

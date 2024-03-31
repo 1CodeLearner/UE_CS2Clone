@@ -12,3 +12,8 @@ void UGameplayDisplay::SetTime(float time)
 
 	TimeText->SetText(FText::FromString(PrintTime));
 }
+
+void UGameplayDisplay::SetWinner(FText winnerText)
+{
+	TimeText->SetText(winnerText);
+}

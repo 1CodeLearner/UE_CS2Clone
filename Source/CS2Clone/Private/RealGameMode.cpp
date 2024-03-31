@@ -15,12 +15,13 @@
 namespace MatchState
 {
 	const FName Cooldown = FName("Cooldown");
+	const FName GameFinished = FName("GameFinished");
 }
 
 ARealGameMode::ARealGameMode()
 {
 	bDelayedStart = true;
-	CountDownTime = 6.f;
+	CountDownTime = 2.5f;
 	DestTime = 10.f;
 	MarkedTime = 0.f;
 	bStart = false;
@@ -47,14 +48,11 @@ void ARealGameMode::OnPlayerDead(AMyCharacter* character)
 	}
 
 	if (isMatchOver) {
-		//GetWorld()->ServerTravel("'/Game/Level_Gameplay.Level_Gameplay'",GetTravelType()); // doesn't load clients property
-		//RestartTest();
-		SetMatchState(MatchState::Cooldown);
-		/*FTimerHandle Handle;
-		GetWorld()->GetTimerManager().SetTimer(Handle, this, &ARealGameMode::RestartTest, 5.f, false);*/
+		if (GS->EWinner == ETeam::TEAM_MAX)
+			SetMatchState(MatchState::Cooldown);
+		else
+			SetMatchState(MatchState::GameFinished);
 	}
-	//instead of using this function, use WaitingPostMatch MatchState from AGameMode
-
 }
 
 void ARealGameMode::Tick(float DeltaSeconds)
@@ -102,6 +100,9 @@ void ARealGameMode::InitGame(const FString& MapName, const FString& Options, FSt
 
 	GI = GetGameInstance<UCSGameInstance>();
 
+	if (GI->IsGameOnGoing())
+		CountDownTime = 2.f;
+
 	/*
 	* if game did not start - mark game as started.
 	* if game did start - skip delay start and start game immediately
@@ -118,8 +119,24 @@ void ARealGameMode::BeginPlay()
 void ARealGameMode::OnMatchStateSet()
 {
 	Super::OnMatchStateSet();
+	if (MatchState == MatchState::EnteringMap) {
+		for (auto i : TActorRange<AMyPlayerController>(GetWorld())) {
+			if (i) {
+				i->SetMatchState(MatchState);
+			}
+		}
+	}
+	else if (MatchState == MatchState::Cooldown) {
+		for (auto i : TActorRange<AMyPlayerController>(GetWorld())) {
+			if (i) {
+				i->SetMatchState(MatchState);
+			}
+		}
 
-	if (MatchState == MatchState::Cooldown) {
+		FTimerHandle Handle;
+		GetWorld()->GetTimerManager().SetTimer(Handle, this, &ARealGameMode::RestartTest, 2.f, false);
+	}
+	else if (MatchState == MatchState::GameFinished) {
 		for (auto i : TActorRange<AMyPlayerController>(GetWorld())) {
 			if (i) {
 				i->SetMatchState(MatchState);

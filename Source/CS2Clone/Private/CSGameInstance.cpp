@@ -3,6 +3,9 @@
 
 #include "CSGameInstance.h"
 #include "InventoryComponent.h"
+#include "Net/UnrealNetwork.h"
+
+
 UCSGameInstance::UCSGameInstance()
 {
 	ConstructorHelpers::FObjectFinder<UDataTable> tempDT(TEXT("/Script/Engine.DataTable'/Game/Justin/Data/DT_ItemType.DT_ItemType'"));
@@ -31,6 +34,13 @@ UCSGameInstance::UCSGameInstance()
 void UCSGameInstance::Init()
 {
 	Super::Init();
+}
+
+void UCSGameInstance::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(UCSGameInstance, bGameOngoing);
 }
 
 void UCSGameInstance::SetGameOnGoing(bool bStarted)

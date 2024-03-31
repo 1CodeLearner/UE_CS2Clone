@@ -18,7 +18,7 @@ class CS2CLONE_API UGameplayDisplay : public UUserWidget
 	GENERATED_BODY()
 public:
 	void SetTime(float time);
-
+	void SetWinner(FText winnerText);
 public:
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UTextBlock> TimeText;
