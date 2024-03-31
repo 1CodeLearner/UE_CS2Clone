@@ -219,18 +219,17 @@ void ACHandgun::Fire()
 
 void ACHandgun::OnRep_Owner()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Owner Replicated"));
 }
 
 void ACHandgun::Server_Fire_Implementation(FHitResult Hit)
 {
-	UE_LOG(LogTemp, Warning, TEXT("HandGun, Net: %s"), GetWorld()->GetNetMode() == NM_Client ? TEXT("Client") : TEXT("Server"));
+	/*UE_LOG(LogTemp, Warning, TEXT("HandGun, Net: %s"), GetWorld()->GetNetMode() == NM_Client ? TEXT("Client") : TEXT("Server"));
 	if (HasAuthority())
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Server?"));
 	}
 	else
-		UE_LOG(LogTemp, Warning, TEXT("client?"));
+		UE_LOG(LogTemp, Warning, TEXT("client?"));*/
 
 	//플레이어가 맞았다면:
 	if (Hit.GetActor())

@@ -28,8 +28,6 @@ void ACInteractableItem::BeginPlay()
 
 	BoxComp->OnComponentBeginOverlap.AddDynamic(this, &ACInteractableItem::OnOverlapBegin);
 
-	UE_LOG(LogTemp, Warning, TEXT("Tag Name: %s"), *ItemNameTag.GetTagName().ToString());
-
 	if (ensure(DT_Items))
 	{
 		FItemType* Info = DT_Items->FindRow<FItemType>(ItemNameTag.GetTagName(), FString::Printf(TEXT("")));
@@ -60,7 +58,6 @@ void ACInteractableItem::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent
 	//플레이어랑 충돌 났으면 => 나중에 인벤토리에 아이템이 들어가 있는지 없는지 판단
 	if (player)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Get Item"));
 		//인벤에 이 아이템 정보 넣어라
 		bool isGetItem = player->GetItem(ItemInfo);
 		if(isGetItem)Destroy();

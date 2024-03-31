@@ -10,6 +10,11 @@
 #include "CSGameInstance.h"
 #include "Justin/Framework/MyGameState.h"
 
+namespace MatchState
+{
+	const FName Cooldown = FName("Cooldown");
+}
+
 ARealGameMode::ARealGameMode()
 {
 	bDelayedStart = true;
@@ -21,20 +26,30 @@ ARealGameMode::ARealGameMode()
 
 void ARealGameMode::OnPlayerDead(AMyCharacter* character)
 {
-	bool isMatchOver = false;
 	if (GS)
 	{
-		GS->OnPlayerDead(character, isMatchOver);
+		GS->OnPlayerDead(character);
 	}
 
-	if (isMatchOver)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Match is over? %s"), isMatchOver ? TEXT("YES") : TEXT("NO"));
+	bool isMatchOver = false;
 
-		//instead of using this function, use WaitingPostMatch MatchState from AGameMode
+	if (GS->ETeamWon == ETeam::TEAM_CT) {
+		UE_LOG(LogTemp, Warning, TEXT("CounterTerrorism wins by %d"), GS->CT_Score);
+		GI->teamInfoMap[ETeam::TEAM_CT].IncrementScore();
+		isMatchOver = true;
+	}
+	else {
+		UE_LOG(LogTemp, Warning, TEXT("Terrorist wins by %d"), GS->T_Score);
+		GI->teamInfoMap[ETeam::TEAM_T].IncrementScore();
+		isMatchOver = true;
+	}
+
+	if (isMatchOver) {
 		FTimerHandle Handle;
 		GetWorld()->GetTimerManager().SetTimer(Handle, this, &ARealGameMode::RestartTest, 5.f, false);
 	}
+	//instead of using this function, use WaitingPostMatch MatchState from AGameMode
+
 }
 
 void ARealGameMode::Tick(float DeltaSeconds)
@@ -52,7 +67,6 @@ void ARealGameMode::Tick(float DeltaSeconds)
 
 			if (HasAuthority())
 			{
-				UE_LOG(LogTemp, Warning, TEXT("Timer ended"));
 				StartMatch();
 			}
 		}
@@ -73,7 +87,9 @@ void ARealGameMode::PostLogin(APlayerController* NewPlayer)
 void ARealGameMode::InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage)
 {
 	Super::InitGame(MapName, Options, ErrorMessage);
-	UE_LOG(LogTemp, Warning, TEXT("InitGame"));
+
+	GI = GetGameInstance<UCSGameInstance>();
+
 	/*
 	* if game did not start - mark game as started.
 	* if game did start - skip delay start and start game immediately
@@ -85,10 +101,6 @@ void ARealGameMode::BeginPlay()
 	Super::BeginPlay();
 
 	GS = Cast<AMyGameState>(GameState);
-	if (ensure(GS))
-	{
-		UE_LOG(LogTemp, Warning, TEXT("GameState created %s "), *GetNameSafe(GS));
-	}
 }
 
 void ARealGameMode::HandleMatchIsWaitingToStart()
@@ -102,9 +114,6 @@ void ARealGameMode::HandleMatchHasStarted()
 {
 	Super::HandleMatchHasStarted();
 
-	UE_LOG(LogTemp, Warning, TEXT("MatchStart"));
-
-	auto GI = GetWorld()->GetGameInstance<UCSGameInstance>();
 	if (GI && GI->IsGameOnGoing())
 	{
 		UpdateTeam();
@@ -119,8 +128,6 @@ void ARealGameMode::HandleMatchHasStarted()
 void ARealGameMode::HandleLeavingMap()
 {
 	Super::HandleLeavingMap();
-
-	UE_LOG(LogTemp, Warning, TEXT("Leaving map....`"));
 }
 
 void ARealGameMode::RestartTest()
@@ -154,12 +161,17 @@ void ARealGameMode::AssignTeam()
 			}
 
 			FString PlayerId = PS->GetUniqueId().ToString();
-			UE_LOG(LogTemp, Warning, TEXT("[%d]: PlayerId: %s"), i, *PlayerId);
+			UE_LOG(LogTemp, Warning, TEXT("[%s]: team: %s"),
+				*PlayerId, *UEnum::GetValueAsString(PS->TeamType));
 
 			//add Player info on Game instance
-			auto GI = GetWorld()->GetGameInstance<UCSGameInstance>();
 			uint32 rand = FMath::RandRange(0, 10);
-			GI->playerInfoMap.Add(PlayerId, FPlayerInfo(rand, PS->TeamType));
+			if (ensure(GI)) {
+				GI->playerInfoMap.Add(PlayerId, FPlayerInfo(PS->TeamType));
+
+				GI->teamInfoMap.Add(ETeam::TEAM_CT, FTeamInfo());
+				GI->teamInfoMap.Add(ETeam::TEAM_T, FTeamInfo());
+			}
 		}
 	}
 }
@@ -170,20 +182,26 @@ void ARealGameMode::UpdateTeam()
 	{
 		for (int i = 0; i < GS->PlayerArray.Num(); ++i)
 		{
-
-			auto GI = GetWorld()->GetGameInstance<UCSGameInstance>();
-			TMap<FString, FPlayerInfo>& playerMapping = GI->playerInfoMap;
-
 			auto PS = Cast<AMyPlayerState>(GS->PlayerArray[i]);
 			FString PlayerId = PS->GetUniqueId().ToString();
 
-			uint32 rand = playerMapping[PlayerId].testing++;
-			ETeam team = playerMapping[PlayerId].TeamType;
-			UE_LOG(LogTemp, Warning, TEXT("Update: %d, %s"), rand, *UEnum::GetValueAsString(team));
-
+			ETeam team = GI->playerInfoMap[PlayerId].TeamType;
 			PS->TeamType = team;
 			PS->SetTeamMesh();
+
+			if (PS->TeamType == ETeam::TEAM_CT)
+				GS->Team_CounterTerrorist.Add(PS);
+			else
+				GS->Team_Terrorist.Add(PS);
+
+			UE_LOG(LogTemp, Warning, TEXT("[%s]: team: %s"),
+				*PlayerId, *UEnum::GetValueAsString(PS->TeamType));
 		}
+
+		GS->CT_Score = GI->teamInfoMap[ETeam::TEAM_CT].GetScore();
+		GS->T_Score = GI->teamInfoMap[ETeam::TEAM_T].GetScore();
+		UE_LOG(LogTemp, Warning, TEXT("UpdateTeam() CT: %d, T: %d"), GS->CT_Score, GS->T_Score);
+
 	}
 }
 

@@ -11,6 +11,8 @@
  *
  */
 class AMyPlayerState;
+class ARealGameMode;
+enum class ETeam : uint8;
 
 UCLASS()
 class CS2CLONE_API AMyGameState : public AGameState
@@ -19,7 +21,7 @@ class CS2CLONE_API AMyGameState : public AGameState
 
 	friend class ARealGameMode;
 public:
-
+	AMyGameState();
 protected:
 	virtual void GetLifetimeReplicatedProps(TArray< FLifetimeProperty > &OutLifetimeProps) const override;
 
@@ -35,7 +37,10 @@ protected:
 
 	TArray<AMyPlayerState*> Team_CounterTerrorist;
 	TArray<AMyPlayerState*> Team_Terrorist;
+			
+	ETeam ETeamWon;
+
 private:
 	bool IsTeamEliminated(const TArray<AMyPlayerState*>& Team);
-	void OnPlayerDead(AMyCharacter* character, bool& bIsMatchOver);
+	void OnPlayerDead(AMyCharacter* character);
 };

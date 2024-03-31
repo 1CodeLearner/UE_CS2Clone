@@ -9,6 +9,12 @@
 class UCSGameInstance; 
 class AMyCharacter; 
 class AMyGameState;
+
+namespace MatchState
+{
+	extern CS2CLONE_API const FName Cooldown;
+}
+
 /**
  *
  */
@@ -36,7 +42,13 @@ protected:
 	//instead of using this function, use WaitingPostMatch MatchState from AGameMode
 	UFUNCTION()
 	void RestartTest();
+
+protected:
+
+
 private:
+	UPROPERTY()
+	TObjectPtr<UCSGameInstance> GI;
 	UPROPERTY()
 	TObjectPtr<AMyGameState> GS;
 	void AssignTeam();

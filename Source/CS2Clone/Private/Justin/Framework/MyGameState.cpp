@@ -4,6 +4,12 @@
 #include "Justin/Framework/MyGameState.h"
 #include "Net/UnrealNetwork.h"
 #include "Justin/Framework/MyPlayerState.h"
+#include "RealGameMode.h"
+
+AMyGameState::AMyGameState()
+{
+	ETeamWon = ETeam::TEAM_MAX;
+}
 
 void AMyGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
@@ -15,12 +21,11 @@ void AMyGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLife
 
 void AMyGameState::OnRep_ScoreUpdate()
 {
-	UE_LOG(LogTemp, Warning, TEXT("CT: %d, T: %d"), CT_Score, T_Score);
+	UE_LOG(LogTemp, Warning, TEXT("OnRep_ScoreUpdate() CT: %d, T: %d"), CT_Score, T_Score);
 }
 
-void AMyGameState::OnPlayerDead(AMyCharacter* character, bool& bIsMatchOver)
+void AMyGameState::OnPlayerDead(AMyCharacter* character)
 {
-	bIsMatchOver = false;
 	if (character)
 	{
 		auto PS = Cast<AMyPlayerState>(character->GetPlayerState());
@@ -33,16 +38,18 @@ void AMyGameState::OnPlayerDead(AMyCharacter* character, bool& bIsMatchOver)
 		{
 			if (IsTeamEliminated(Team_CounterTerrorist))
 			{
-				CT_Score++;
-				bIsMatchOver = true;
+				ETeamWon = ETeam::TEAM_T;
+				T_Score++;
+				OnRep_ScoreUpdate();
 			}
 		}
 		else
 		{
 			if (IsTeamEliminated(Team_Terrorist))
 			{
-				T_Score++;
-				bIsMatchOver = true;
+				ETeamWon = ETeam::TEAM_CT;
+				CT_Score++;
+				OnRep_ScoreUpdate();
 			}
 		}
 	}

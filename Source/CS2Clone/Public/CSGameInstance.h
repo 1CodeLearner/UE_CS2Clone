@@ -19,20 +19,33 @@ struct FPlayerInfo
 public:
 	FPlayerInfo()
 	{
-		testing = 0;
 		TeamType = ETeam::TEAM_MAX;
 	};
-	FPlayerInfo(uint32 test, ETeam team)
+	FPlayerInfo(ETeam team)
 	{
-		testing = test;
 		TeamType = team;
 	}
 
 	UPROPERTY()
-	uint32 testing; 
-
-	UPROPERTY()
 	ETeam TeamType;
+};
+
+USTRUCT()
+struct FTeamInfo {
+
+	GENERATED_BODY()
+public:
+	void IncrementScore()
+	{
+		Score++;
+	}
+	int32 GetScore() const
+	{
+		return Score;	
+	}
+private:
+	UPROPERTY()
+	int32 Score = 0;
 };
 
 UCLASS()
@@ -50,7 +63,10 @@ public:
 	TArray<struct FItemType> defineItem;
 
 	UPROPERTY()
-	TMap<FString,FPlayerInfo> playerInfoMap;
+	TMap<FString, FPlayerInfo> playerInfoMap;
+
+	UPROPERTY()
+	TMap<ETeam, FTeamInfo> teamInfoMap;
 
 	void SetGameOnGoing(bool bStarted);
 	bool IsGameOnGoing() const;
