@@ -10,6 +10,7 @@
 #include "CSGameInstance.h"
 #include "Justin/Framework/MyGameState.h"
 #include "EngineUtils.h"
+#include "GameFramework/PlayerStart.h"
 
 namespace MatchState
 {
@@ -45,7 +46,7 @@ void ARealGameMode::OnPlayerDead(AMyCharacter* character)
 		isMatchOver = true;
 	}
 
-	if (isMatchOver) {		
+	if (isMatchOver) {
 		//GetWorld()->ServerTravel("'/Game/Level_Gameplay.Level_Gameplay'",GetTravelType()); // doesn't load clients property
 		//RestartTest();
 		SetMatchState(MatchState::Cooldown);
@@ -118,34 +119,12 @@ void ARealGameMode::OnMatchStateSet()
 {
 	Super::OnMatchStateSet();
 
-	if(MatchState == MatchState::Cooldown){
-		for(auto i : TActorRange<AMyPlayerController>(GetWorld())){
-			if(i){
+	if (MatchState == MatchState::Cooldown) {
+		for (auto i : TActorRange<AMyPlayerController>(GetWorld())) {
+			if (i) {
 				i->SetMatchState(MatchState);
 			}
 		}
-	}
-}
-
-void ARealGameMode::HandleMatchIsWaitingToStart()
-{
-	Super::HandleMatchIsWaitingToStart();
-
-	StartTimer();
-}
-
-void ARealGameMode::HandleMatchHasStarted()
-{
-	Super::HandleMatchHasStarted();
-
-	if (GI && GI->IsGameOnGoing())
-	{
-		UpdateTeam();
-	}
-	else
-	{
-		GI->SetGameOnGoing(true);
-		AssignTeam();
 	}
 }
 
@@ -159,7 +138,33 @@ void ARealGameMode::RestartTest()
 	RestartGame();
 }
 
-void ARealGameMode::AssignTeam()
+void ARealGameMode::HandleMatchIsWaitingToStart()
+{
+	Super::HandleMatchIsWaitingToStart();
+
+	StartTimer();
+}
+
+void ARealGameMode::HandleMatchHasStarted()
+{
+	if (GI && GI->IsGameOnGoing())
+	{
+		UpdateTeam();
+	}
+	else
+	{
+		GI->SetGameOnGoing(true);
+		Initialize();
+	}
+
+	//Spawns players
+	Super::HandleMatchHasStarted();
+
+	//Replicates team mesh for players
+	PreparePlayers();
+}
+
+void ARealGameMode::Initialize()
 {
 	if (ensure(GS))
 	{
@@ -173,13 +178,11 @@ void ARealGameMode::AssignTeam()
 				if (GS->Team_CounterTerrorist.Num() < GS->Team_Terrorist.Num())
 				{
 					PS->TeamType = ETeam::TEAM_CT;
-					PS->SetTeamMesh();
 					GS->Team_CounterTerrorist.Add(PS);
 				}
 				else
 				{
 					PS->TeamType = ETeam::TEAM_T;
-					PS->SetTeamMesh();
 					GS->Team_Terrorist.Add(PS);
 				}
 			}
@@ -189,12 +192,65 @@ void ARealGameMode::AssignTeam()
 				*PlayerId, *UEnum::GetValueAsString(PS->TeamType));
 
 			//add Player info on Game instance
-			uint32 rand = FMath::RandRange(0, 10);
 			if (ensure(GI)) {
 				GI->playerInfoMap.Add(PlayerId, FPlayerInfo(PS->TeamType));
 
 				GI->teamInfoMap.Add(ETeam::TEAM_CT, FTeamInfo());
 				GI->teamInfoMap.Add(ETeam::TEAM_T, FTeamInfo());
+			}
+		}
+	}
+}
+
+void ARealGameMode::RestartPlayer(AController* NewPlayer)
+{
+	if (NewPlayer == nullptr || NewPlayer->IsPendingKillPending())
+	{
+		return;
+	}
+
+	if (ensure(GS)) {
+		auto PSTemp = NewPlayer->GetPlayerState<AMyPlayerState>();
+		AActor* StartSpot = nullptr;
+		if (PSTemp) {
+			if (GS->Team_CounterTerrorist.Contains(PSTemp)) {
+				StartSpot = FindPlayerStart(NewPlayer, FString::Printf(TEXT("CT")));
+			}
+			else {
+				StartSpot = FindPlayerStart(NewPlayer, FString::Printf(TEXT("T")));
+			}
+		}
+		SpawnTeamLocation(StartSpot, NewPlayer);
+	}
+}
+
+void ARealGameMode::SpawnTeamLocation(AActor* StartSpot, AController* NewPlayer)
+{
+	// If a start spot wasn't found,
+	if (StartSpot == nullptr)
+	{
+		// Check for a previously assigned spot
+		if (NewPlayer->StartSpot != nullptr)
+		{
+			StartSpot = NewPlayer->StartSpot.Get();
+			UE_LOG(LogGameMode, Warning, TEXT("RestartPlayer: Player start not found, using last start spot"));
+		}
+	}
+
+	RestartPlayerAtPlayerStart(NewPlayer, StartSpot);
+}
+
+void ARealGameMode::PreparePlayers()
+{
+	if (ensure(GS))
+	{
+		for (int i = 0; i < GS->PlayerArray.Num(); ++i)
+		{
+			auto PS = Cast<AMyPlayerState>(GS->PlayerArray[i]);
+
+			if (ensure(PS))
+			{
+				PS->SetTeamMesh();
 			}
 		}
 	}

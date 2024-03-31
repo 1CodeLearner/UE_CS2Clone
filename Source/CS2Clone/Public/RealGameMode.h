@@ -37,6 +37,9 @@ protected:
 
 	virtual void OnMatchStateSet() override;
 
+	virtual void RestartPlayer(AController* NewPlayer) override;
+	void SpawnTeamLocation(AActor* StartSpot, AController* NewPlayer);
+
 	virtual void HandleMatchIsWaitingToStart() override; 
 	virtual void HandleMatchHasStarted() override;
 	virtual void HandleLeavingMap() override;
@@ -45,15 +48,14 @@ protected:
 	UFUNCTION()
 	void RestartTest();
 
-protected:
-
-
 private:
 	UPROPERTY()
 	TObjectPtr<UCSGameInstance> GI;
 	UPROPERTY()
 	TObjectPtr<AMyGameState> GS;
-	void AssignTeam();
+	void Initialize();
+	void PreparePlayers();
+
 	void UpdateTeam();
 
 	//카운트다운 정보 처리
