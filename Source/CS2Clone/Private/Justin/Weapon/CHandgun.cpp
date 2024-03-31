@@ -50,8 +50,8 @@ void ACHandgun::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetim
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME_CONDITION(ACHandgun, ReserveTotalRounds, COND_OwnerOnly);
-	DOREPLIFETIME_CONDITION(ACHandgun, InMagRemainingRounds, COND_OwnerOnly);
+	DOREPLIFETIME(ACHandgun, ReserveTotalRounds);
+	DOREPLIFETIME(ACHandgun, InMagRemainingRounds);
 }
 
 void ACHandgun::Tick(float DeltaSeconds)
@@ -160,7 +160,14 @@ void ACHandgun::Client_CompleteReload_Implementation()
 bool ACHandgun::CanFire() const
 {
 	//탄창에 총알이 있을때 && reloading 하고 있지 않을때
+	
+	UE_LOG(LogTemp, Warning, TEXT("Remaining rounds: InMagRemainingRounds %d"), 
+		//*(GetWorld()->GetNetMode() == NM_Client ? TEXT("Client") : TEXT("Server")),
+		InMagRemainingRounds
+		);
 	return InMagRemainingRounds > 0 && !bClientReloading;
+
+
 }
 
 //이 함수로 쏜다
@@ -190,7 +197,7 @@ void ACHandgun::Fire()
 	//	}
 
 	//}
-	
+
 	AActor* camera = UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0);
 
 	if (CanFire() && ensure(FireAnimSeq) && camera)
@@ -231,7 +238,7 @@ void ACHandgun::Server_Fire_Implementation(FHitResult Hit)
 	else
 		UE_LOG(LogTemp, Warning, TEXT("client?"));*/
 
-	//플레이어가 맞았다면:
+		//플레이어가 맞았다면:
 	if (Hit.GetActor())
 	{
 		//UE_LOG(LogTemp, Warning, TEXT("Owner: %s"), *GetNameSafe(Hit.GetActor()->GetOwner()));
@@ -261,7 +268,8 @@ void ACHandgun::Server_Fire_Implementation(FHitResult Hit)
 
 	if (InMagRemainingRounds < 0)
 		InMagRemainingRounds = 0;
-	Multi_Fire();
+	if (InMagRemainingRounds != 0)
+		Multi_Fire();
 }
 
 void ACHandgun::Multi_Fire_Implementation()

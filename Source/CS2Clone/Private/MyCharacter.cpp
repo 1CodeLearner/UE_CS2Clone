@@ -137,7 +137,7 @@ void AMyCharacter::EnhancedLook(const struct FInputActionValue& value)
 
 	AddControllerYawInput(dir.X);
 	AddControllerPitchInput(dir.Y);
-	
+
 }
 
 void AMyCharacter::EnhancedDrop(const struct FInputActionValue& value)
@@ -236,7 +236,7 @@ void AMyCharacter::MultiAttachGun_Implementation()
 	if (!hasPistol) // true면 내려가 
 	{
 		// 핸드건 스폰
-		if (HasAuthority()) 
+		if (HasAuthority())
 		{
 			handGun = GetWorld()->SpawnActor<ACHandgun>(invenComp->myItems[1].GameplayItemClass, GetActorLocation(), GetActorRotation());
 			if (handGun != nullptr)
@@ -245,7 +245,7 @@ void AMyCharacter::MultiAttachGun_Implementation()
 		}
 		//핸드건 가지고있다
 		hasPistol = true;
-		if(HasAuthority())
+		if (HasAuthority())
 			handGun->SetOwner(this);
 		anim->hasPistol = true;
 	}
@@ -270,7 +270,7 @@ void AMyCharacter::MultiDetachGun_Implementation()
 	// 총 가지고 있으면
 	if (hasPistol)
 	{
-		
+
 		FVector GunLoc = GunComponent->GetComponentLocation();
 		//FVector DropLoc = GunComponent;
 		UE_LOG(LogTemp, Warning, TEXT("Drop Item"));
@@ -284,7 +284,7 @@ void AMyCharacter::MultiDetachGun_Implementation()
 		hasPistol = false;
 		handGun->Destroy();
 	}
-		anim->hasPistol = false;
+	anim->hasPistol = false;
 
 }
 
@@ -295,8 +295,7 @@ void AMyCharacter::PlayerFIre()
 
 void AMyCharacter::ServerPlayerFire_Implementation()
 {
-	MultiPlayerFire();	
-	
+	MultiPlayerFire();
 }
 
 void AMyCharacter::MultiPlayerFire_Implementation()
@@ -342,7 +341,7 @@ void AMyCharacter::PlayerDead()
 void AMyCharacter::ServerDead_Implementation()
 {
 	MultiDead();
-	
+
 }
 
 void AMyCharacter::MultiDead_Implementation()
@@ -353,19 +352,19 @@ void AMyCharacter::MultiDead_Implementation()
 		if (HasAuthority())
 		{
 
-		UE_LOG(LogTemp,Warning, TEXT("dead"));
-		// 충돌 안되게
-		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-		GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-		// Movement 컴포넌트 비활성
-		GetCharacterMovement()->DisableMovement();
-		MultiDetachGun();
-		AMyPlayerController* pc = Cast<AMyPlayerController>(GetController()); 
-		auto spectatorTest = GetWorld()->SpawnActor<ASpectatorPawn>(GetWorld()->GetAuthGameMode()->SpectatorClass, GetActorLocation(), GetActorRotation());
-		
-		pc->Possess(spectatorTest);
-		Destroy();
-		
+			UE_LOG(LogTemp, Warning, TEXT("dead"));
+			// 충돌 안되게
+			GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+			GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+			// Movement 컴포넌트 비활성
+			GetCharacterMovement()->DisableMovement();
+			MultiDetachGun();
+			AMyPlayerController* pc = Cast<AMyPlayerController>(GetController());
+			auto spectatorTest = GetWorld()->SpawnActor<ASpectatorPawn>(GetWorld()->GetAuthGameMode()->SpectatorClass, GetActorLocation(), GetActorRotation());
+
+			pc->Possess(spectatorTest);
+			Destroy();
+
 		}
 	}
 }
