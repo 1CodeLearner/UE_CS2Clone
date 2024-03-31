@@ -20,7 +20,6 @@ ACHandgun::ACHandgun()
 	ReserveTotalRounds = 0;
 	InMagTotalRounds = 0;
 	InMagRemainingRounds = 0;
-	bClientReloading = false;
 }
 
 
@@ -52,6 +51,7 @@ void ACHandgun::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetim
 
 	DOREPLIFETIME(ACHandgun, ReserveTotalRounds);
 	DOREPLIFETIME(ACHandgun, InMagRemainingRounds);
+	DOREPLIFETIME(ACHandgun, bReloading);
 }
 
 void ACHandgun::Tick(float DeltaSeconds)
@@ -103,7 +103,7 @@ void ACHandgun::LogGunState()
 bool ACHandgun::CanReload() const
 {
 	//탄창이 채워지지 않았을 경우 && 예비 탄약이 있을 경우 && 재장전 하고 있지 않은 경우
-	return InMagRemainingRounds != InMagTotalRounds && ReserveTotalRounds != 0 && !bClientReloading;
+	return InMagRemainingRounds != InMagTotalRounds && ReserveTotalRounds != 0 && !bReloading;
 }
 
 //이 함수로 장전
@@ -112,7 +112,6 @@ void ACHandgun::Reload()
 	if (CanReload())
 	{
 		SKMComponent->PlayAnimation(ReloadAnimSeq, false);
-		bClientReloading = true;
 		Server_Reload();
 	}
 }
@@ -120,7 +119,8 @@ void ACHandgun::Reload()
 void ACHandgun::Server_Reload_Implementation()
 {
 	FTimerHandle handle;
-	GetWorld()->GetTimerManager().SetTimer(handle, this, &ACHandgun::CompleteReload, 1.5f, false);
+	GetWorld()->GetTimerManager().SetTimer(handle, this, &ACHandgun::CompleteReload, 1.8f, false);
+	bReloading = true;
 	Multi_Reload();
 }
 
@@ -147,25 +147,14 @@ void ACHandgun::CompleteReload()
 
 	InMagRemainingRounds += refillAmt;
 
-	//Reset bool for server
-	bClientReloading = false;
-	Client_CompleteReload();
-}
-
-void ACHandgun::Client_CompleteReload_Implementation()
-{
-	bClientReloading = false;
+	bReloading = false;
 }
 
 bool ACHandgun::CanFire() const
 {
 	//탄창에 총알이 있을때 && reloading 하고 있지 않을때
-	
-	UE_LOG(LogTemp, Warning, TEXT("Remaining rounds: InMagRemainingRounds %d"), 
-		//*(GetWorld()->GetNetMode() == NM_Client ? TEXT("Client") : TEXT("Server")),
-		InMagRemainingRounds
-		);
-	return InMagRemainingRounds > 0 && !bClientReloading;
+
+	return InMagRemainingRounds > 0 && !bReloading;
 
 
 }

@@ -65,9 +65,6 @@ protected:
 	void Multi_Reload();
 	UFUNCTION()
 	void CompleteReload(); //서버에서만 불러진다
-	UFUNCTION(Client, Reliable)
-	void Client_CompleteReload();
-
 
 	//발사
 	UFUNCTION(Server, Reliable)
@@ -83,9 +80,9 @@ private:
 	int InMagTotalRounds;
 	UPROPERTY(VisibleAnywhere, Replicated, Category = "Settings|Rounds")
 	int InMagRemainingRounds;
+	UPROPERTY(Replicated)
+	bool bReloading;
 
-	//클라이언트가 재장전 하고 있는지 확인
-	bool bClientReloading;
 	//출력
 	void LogGunState();
 };
