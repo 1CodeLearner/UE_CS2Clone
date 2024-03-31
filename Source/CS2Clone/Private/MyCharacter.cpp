@@ -36,21 +36,21 @@ AMyCharacter::AMyCharacter()
 	GetMesh()->SetRelativeLocation(FVector(0, 0, -88));
 	GetMesh()->SetRelativeRotation(FRotator(0, -90, 0));
 
-	springArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("springArm"));
-	springArm->SetupAttachment(RootComponent);
-	springArm->SetWorldLocation(FVector(30, 0, 80));
-
 	camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
-	camera->SetupAttachment(springArm);
-	camera->SetWorldLocation(FVector(0, 0, 0));
+	camera->SetupAttachment(GetMesh(), FName(TEXT("headSocket")));
+	camera->SetRelativeLocation(FVector(9.8f, 13.2f, 0));
+	camera->SetRelativeRotation(FRotator(0, 80, 270));
+	//camera->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale);
 
 	//invencomp
 	invenComp = CreateDefaultSubobject<UInventoryComponent>(TEXT("PlayerInventory"));
 
 	GunComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Gun"));
 	GunComponent->SetupAttachment(GetMesh(), FName(TEXT("GunPosition")));
-	GunComponent->SetRelativeLocation(FVector(-7.144f, 3.68f, 4.136f));
+	GunComponent->SetRelativeLocation(FVector(-7.144f, 3.68f, 0));
 	GunComponent->SetRelativeRotation(FRotator(3.4f, 75.699f, 6.6424f));
+
+
 }
 
 // Called when the game starts or when spawned
