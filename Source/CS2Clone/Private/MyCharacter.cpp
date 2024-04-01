@@ -18,6 +18,8 @@
 #include "Justin/Framework/MyPlayerController.h"
 #include <../../../../../../../Source/Runtime/Engine/Classes/GameFramework/GameModeBase.h>
 #include "GameFramework/SpectatorPawn.h"
+#include <../../../../../../../Source/Runtime/Engine/Classes/Engine/Texture2D.h>
+#include <../../../../../../../Source/Runtime/UMG/Public/Components/Image.h>
 
 // Sets default values
 AMyCharacter::AMyCharacter()
@@ -66,12 +68,12 @@ void AMyCharacter::BeginPlay()
 	anim = Cast<UPlayerAnimInstance>(GetMesh()->GetAnimInstance());
 
 	hasPistol = false;
-	MyUserWidget = Cast<UMyUserWidget>(CreateWidget(GetWorld(), MyUserWidgetFactory));
-	MyUserWidget->AddToViewport();
 
-
+	// 클라입장에서만 추가
 	if (IsLocallyControlled())
 	{
+		MyUserWidget = Cast<UMyUserWidget>(CreateWidget(GetWorld(), MyUserWidgetFactory));
+		MyUserWidget->AddToViewport();
 		MappingContext();
 	}
 
@@ -114,7 +116,13 @@ void AMyCharacter::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
 
-	MappingContext();
+	//서버 입장에서만 추가
+	if (IsLocallyControlled())
+	{
+		MyUserWidget = Cast<UMyUserWidget>(CreateWidget(GetWorld(), MyUserWidgetFactory));
+		MyUserWidget->AddToViewport();
+		MappingContext();
+	}
 }
 
 void AMyCharacter::EnhancedMove(const struct FInputActionValue& value)
@@ -165,6 +173,7 @@ void AMyCharacter::SelectItem(const struct FInputActionValue& value)
 
 void AMyCharacter::EnhancedFire(const struct FInputActionValue& value)
 {
+
 	//if (hasPistol && invenComp->myItems[1].InventorySlotType == EInventorySlotType::INV_MAX) return;
 	PlayerFIre();
 }
@@ -210,9 +219,18 @@ bool AMyCharacter::GetItem(FItemType itemInfo)
 	//만약 인벤에 있는 아이템 배열에서 아이템 타입이 max가 아니면 false 리턴 
 	//같은 슬롯타입에 아이템을 갖고있으면 안됨 
 	if (invenComp->myItems[invenSlotType].InventorySlotType != EInventorySlotType::INV_MAX) return false;
-
 	//내 인벤 슬롯 타입에 충돌체 아이템정보 추가
 	invenComp->myItems[invenSlotType] = itemInfo;
+
+	//UTexture2D* ConvertPistolSlot = Cast<UTexture2D>(itemInfo.InventoryImage);
+	//유저 위젯에 피스톨 슬롯 가져와서
+	// 인벤토리 이미지로 바꿔
+	//MyUserWidget->PistolSlot = ConvertPistolSlot;
+	if (MyUserWidget)
+	{
+		MyUserWidget->PistolSlot->SetBrushFromTexture(itemInfo.InventoryImage);
+	}
+	
 	return true;
 }
 

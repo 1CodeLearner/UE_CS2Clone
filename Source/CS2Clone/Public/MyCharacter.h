@@ -139,4 +139,7 @@ public:
 	UFUNCTION(NetMulticast, Reliable)
 	void MultiDead();
 
+
+	UPROPERTY(EditAnywhere)
+	class UTexture2D* testTex;
 };

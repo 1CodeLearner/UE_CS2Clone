@@ -58,9 +58,14 @@ void ACInteractableItem::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent
 	//플레이어랑 충돌 났으면 => 나중에 인벤토리에 아이템이 들어가 있는지 없는지 판단
 	if (player)
 	{
+		if(HasAuthority() == true) UE_LOG(LogTemp, Warning, TEXT("Server"))
+		else UE_LOG(LogTemp, Warning, TEXT("Clinet"));
+
+		
 		//인벤에 이 아이템 정보 넣어라
 		bool isGetItem = player->GetItem(ItemInfo);
 		if(isGetItem)Destroy();
+		
 
 	}
 	else
