@@ -222,10 +222,8 @@ bool AMyCharacter::GetItem(FItemType itemInfo)
 	//내 인벤 슬롯 타입에 충돌체 아이템정보 추가
 	invenComp->myItems[invenSlotType] = itemInfo;
 
-	//UTexture2D* ConvertPistolSlot = Cast<UTexture2D>(itemInfo.InventoryImage);
 	//유저 위젯에 피스톨 슬롯 가져와서
 	// 인벤토리 이미지로 바꿔
-	//MyUserWidget->PistolSlot = ConvertPistolSlot;
 	if (MyUserWidget)
 	{
 		MyUserWidget->PistolSlot->SetBrushFromTexture(itemInfo.InventoryImage);
@@ -301,6 +299,12 @@ void AMyCharacter::MultiDetachGun_Implementation()
 		//총 안가지고있다
 		hasPistol = false;
 		handGun->Destroy();
+
+		if (MyUserWidget)
+		{
+			// 아이템 슬롯 비우기
+			MyUserWidget->PistolSlot->SetBrushFromTexture(NULL);
+		}
 	}
 	anim->hasPistol = false;
 

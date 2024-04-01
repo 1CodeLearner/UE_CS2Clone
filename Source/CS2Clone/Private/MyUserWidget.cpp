@@ -2,7 +2,7 @@
 
 
 #include "MyUserWidget.h"
-#include "InventoryComponent.h"
+
 
 void UMyUserWidget::NativeConstruct()
 {
@@ -14,8 +14,3 @@ void UMyUserWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 
 }
 
-void UMyUserWidget::AddPistol()
-{
-	//PistolSlot->image
-	
-}

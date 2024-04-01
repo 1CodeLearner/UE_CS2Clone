@@ -26,13 +26,5 @@ public:
 	UPROPERTY(meta = (BindWidget))
 	class UImage* PistolSlot;
 
-public:
-	UPROPERTY(EditAnywhere)
-	TSubclassOf<class ACInteractableItem> ItemFactory;
 
-	UPROPERTY(EditAnywhere)
-	class UInventoryComponent* invenComp;
-public:
-	UFUNCTION(BlueprintCallable)
-	void AddPistol();
 };
