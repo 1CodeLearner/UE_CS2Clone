@@ -21,7 +21,7 @@ namespace MatchState
 ARealGameMode::ARealGameMode()
 {
 	bDelayedStart = true;
-	CountDownTime = 2.5f;
+	CountDownTime = 15.f;
 	DestTime = 10.f;
 	MarkedTime = 0.f;
 	bStart = false;
