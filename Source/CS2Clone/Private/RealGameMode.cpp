@@ -21,7 +21,7 @@ namespace MatchState
 ARealGameMode::ARealGameMode()
 {
 	bDelayedStart = true;
-	CountDownTime = 15.f;
+	CountDownTime = 12.f;
 	DestTime = 10.f;
 	MarkedTime = 0.f;
 	bStart = false;
@@ -47,9 +47,22 @@ void ARealGameMode::OnPlayerDead(AMyCharacter* character)
 		isMatchOver = true;
 	}
 
+	for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); 
+		Iterator; ++Iterator)
+	{
+		APlayerController* PlayerController = Iterator->Get();
+		auto PC = Cast<AMyPlayerController>(PlayerController);
+		if (PC)
+		{
+			PC->MatchState.CT_Score = GS->CT_Score;
+			PC->MatchState.T_Score = GS->T_Score;
+		}
+	}
+
 	if (isMatchOver) {
-		if (GS->EWinner == ETeam::TEAM_MAX)
+		if (GS->EWinner == ETeam::TEAM_MAX) {
 			SetMatchState(MatchState::Cooldown);
+		}
 		else
 			SetMatchState(MatchState::GameFinished);
 	}
@@ -255,6 +268,7 @@ void ARealGameMode::SpawnTeamLocation(AActor* StartSpot, AController* NewPlayer)
 	}
 
 	RestartPlayerAtPlayerStart(NewPlayer, StartSpot);
+
 }
 
 void ARealGameMode::PreparePlayers()
@@ -293,12 +307,24 @@ void ARealGameMode::UpdateTeam()
 
 			UE_LOG(LogTemp, Warning, TEXT("[%s]: team: %s"),
 				*PlayerId, *UEnum::GetValueAsString(PS->TeamType));
+
 		}
 
 		GS->CT_Score = GI->teamInfoMap[ETeam::TEAM_CT].GetScore();
 		GS->T_Score = GI->teamInfoMap[ETeam::TEAM_T].GetScore();
 		UE_LOG(LogTemp, Warning, TEXT("UpdateTeam() CT: %d, T: %d"), GS->CT_Score, GS->T_Score);
+	}
 
+	for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); 
+		Iterator; ++Iterator)
+	{
+		APlayerController* PlayerController = Iterator->Get();
+		auto PC = Cast<AMyPlayerController>(PlayerController);
+		if (PC)
+		{
+			PC->MatchState.CT_Score = GS->CT_Score;
+			PC->MatchState.T_Score = GS->T_Score;
+		}
 	}
 }
 

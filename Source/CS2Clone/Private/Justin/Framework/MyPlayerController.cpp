@@ -101,7 +101,7 @@ void AMyPlayerController::OnPossess(APawn* aPawn)
 
 void AMyPlayerController::SetMatchState(FName CurrMatchState)
 {
-	MatchState = FMatchState(MatchState.Winner, CurrMatchState);
+	MatchState.CurrentState = CurrMatchState;
 
 	if (IsLocalController())
 		OnRep_OnMatchStateChanged();
@@ -110,36 +110,45 @@ void AMyPlayerController::SetMatchState(FName CurrMatchState)
 void AMyPlayerController::OnRep_OnMatchStateChanged()
 {
 	if (MatchState.CurrentState == MatchState::Cooldown) {
-		UWidgetLayoutLibrary::RemoveAllWidgets(GetWorld());
+		UE_LOG(LogTemp, Warning, TEXT("[%s]: T Score %d"), *MatchState.CurrentState.ToString(), MatchState.T_Score);
+		UE_LOG(LogTemp, Warning, TEXT("[%s]: CT Score %d"), *MatchState.CurrentState.ToString(), MatchState.CT_Score);
+		DisplayResult();
+		FString Result = FString::Printf(TEXT("CounterTerrorist: %d | Terrorist: %d"),
+			MatchState.CT_Score, MatchState.T_Score);
+		GameplayDisplay->SetWinner(FText::FromString(Result));
 		UE_LOG(LogTemp, Warning, TEXT("[%s]: MatchState: %s"), *GetNameSafe(this), *MatchState::Cooldown.ToString());
 	}
 	else if (MatchState.CurrentState == MatchState::GameFinished) {
 		UE_LOG(LogTemp, Warning, TEXT("[%s]: MatchState: %s"), *GetNameSafe(this), *MatchState::GameFinished.ToString());
 
-		if (HasAuthority()) {
-			auto GS = GetWorld()->GetGameState<AMyGameState>();
-			FString string;
-			if (GS) {
-				switch (GS->EWinner) {
-				case ETeam::TEAM_CT:
-					string = FString::Printf(TEXT("CounterTerrorists Wins"));
-					break;
-				case ETeam::TEAM_T:
-					string = FString::Printf(TEXT("Terrorists Wins"));
-					break;
-				}
+		auto GS = GetWorld()->GetGameState<AMyGameState>();
+		FString string;
+		if (GS) {
+			switch (GS->EWinner) {
+			case ETeam::TEAM_CT:
+				string = FString::Printf(TEXT("CounterTerrorist Wins"));
+				break;
+			case ETeam::TEAM_T:
+				string = FString::Printf(TEXT("Terrorist Wins"));
+				break;
 			}
-			DisplayResult();
+		}
+		DisplayResult();
+		FString Result = FString::Printf(TEXT("CounterTerrorist: %d | Terrorist: %d\n"),
+			MatchState.CT_Score, MatchState.T_Score);
+		FString Test = Result + string;
+		FText text = FText::FromString(Test);
+		GameplayDisplay->SetWinner(text);
 
-			FText text = FText::FromString(string);
-			GameplayDisplay->SetWinner(text);
-		}
-		else{
-			Server_RequestWinner();
-		}
+		Server_RequestWinner();
+
 	}
 	else
-		GameplayDisplay->RemoveFromParent();
+	{
+		if (GameplayDisplay)
+			GameplayDisplay->RemoveFromParent();
+	}
+
 
 
 

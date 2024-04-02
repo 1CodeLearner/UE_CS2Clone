@@ -35,33 +35,33 @@ void AMyGameState::OnPlayerDead(AMyCharacter* character)
 		{
 			PS->SetDead(true);
 		}
-
-		if (Team_CounterTerrorist.Contains(PS))
-		{
-			if (IsTeamEliminated(Team_CounterTerrorist))
-			{
-				ETeamWon = ETeam::TEAM_T;
-				T_Score++;
-				OnRep_ScoreUpdate();
-			}
-		}
-		else
-		{
-			if (IsTeamEliminated(Team_Terrorist))
-			{
-				ETeamWon = ETeam::TEAM_CT;
-				CT_Score++;
-				OnRep_ScoreUpdate();
-			}
-		}
-
+		
 		auto PC = character->GetController<AMyPlayerController>();
 		if (PC) {
-			if (CT_Score == 1) {
+			if (Team_CounterTerrorist.Contains(PS))
+			{
+				if (IsTeamEliminated(Team_CounterTerrorist))
+				{
+					ETeamWon = ETeam::TEAM_T;
+					T_Score++;
+					OnRep_ScoreUpdate();
+				}
+			}
+			else
+			{
+				if (IsTeamEliminated(Team_Terrorist))
+				{
+					ETeamWon = ETeam::TEAM_CT;
+					CT_Score++;
+					OnRep_ScoreUpdate();
+				}
+			}
+
+			if (CT_Score == 3) {
 				EWinner = ETeam::TEAM_CT;
 				PC->MatchState.Winner = ETeam::TEAM_CT;
 			}
-			else if (T_Score == 1) {
+			else if (T_Score == 3) {
 				PC->MatchState.Winner = ETeam::TEAM_T;
 				EWinner = ETeam::TEAM_T;
 			}

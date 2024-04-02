@@ -22,6 +22,10 @@ struct FMatchState
 	ETeam Winner;
 	UPROPERTY()
 	FName CurrentState;
+	UPROPERTY()
+	int32 CT_Score;
+	UPROPERTY()
+	int32 T_Score; 
 };
 
 UCLASS()
